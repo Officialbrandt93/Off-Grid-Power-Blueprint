@@ -299,6 +299,116 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 .season-table td{padding:7px 10px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:top}
 .season-table tr:last-child td{border-bottom:none}
 .season-table .freq{font-weight:500;color:var(--slate);font-size:11px}
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  body { flex-direction: column; overflow: auto; height: auto; }
+
+  /* Hide sidebar completely on mobile */
+  .sidebar { display: none; }
+  .sidebar.mobile-open { display: flex; position: fixed; top: 0; left: 0; width: 80vw; max-width: 300px; height: 100vh; z-index: 100; box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
+
+  /* Overlay when sidebar is open */
+  .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+  .mobile-overlay.show { display: block; }
+
+  /* Main takes full width */
+  .main { width: 100%; min-height: 100vh; overflow-y: auto; }
+
+  /* Topbar: show hamburger button */
+  .topbar { padding: 10px 16px; gap: 10px; }
+  .topbar-breadcrumb { font-size: 11px; flex: 1; }
+  .status-chip { font-size: 10px; padding: 3px 8px; }
+
+  /* Hamburger button */
+  .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; flex-shrink: 0; }
+  .hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
+
+  /* Pages */
+  .page { padding: 16px; max-width: 100%; }
+
+  /* Module header */
+  .mod-title { font-size: 20px !important; }
+  .mod-desc { font-size: 13px !important; }
+
+  /* Dash grid: 2 cols on mobile */
+  .dash-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .dash-card { padding: 12px; }
+  .dash-card .d-value { font-size: 15px; }
+
+  /* Click grids: 1 col on small mobile */
+  .click-grid-3 { grid-template-columns: 1fr; }
+  .click-grid-2 { grid-template-columns: 1fr; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .comp-grid { grid-template-columns: 1fr; }
+  .when-grid { grid-template-columns: 1fr; }
+  .spec-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .fact-row { grid-template-columns: 1fr; gap: 8px; }
+  .loss-grid { grid-template-columns: 1fr; }
+  .monitor-grid { grid-template-columns: 1fr; }
+  .remote-options { grid-template-columns: 1fr; }
+  .signal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+  /* Multi result: stack on very small */
+  .multi-result { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 6px; padding: 10px; }
+  .result-block .rb-value { font-size: 16px; }
+  .result-block .rb-label { font-size: 9px; }
+
+  /* Summary grid */
+  .summary-grid { grid-template-columns: 1fr; }
+
+  /* Step row: scrollable */
+  .step-row { overflow-x: auto; }
+  .step-item { min-width: 64px; padding: 10px 4px; }
+  .step-item .s-label { font-size: 9px; }
+
+  /* Calc table inputs */
+  .calc-table td:first-child { width: 45%; font-size: 12px; }
+  .calc-table input, .calc-table select { font-size: 12px; padding: 4px 5px; }
+
+  /* Nameplate wrap: stack */
+  .nameplate-wrap { flex-direction: column; }
+  .np-arrow { display: none; }
+
+  /* PSH bars */
+  .psh-location { width: 90px; font-size: 10px; }
+
+  /* Polarity row */
+  .polarity-row { flex-direction: column; }
+
+  /* Conn diagram: wrap */
+  .conn-diagram { flex-wrap: wrap; }
+
+  /* Power demo bars */
+  .pd-label { width: 36px; font-size: 11px; }
+  .pd-watt { width: 36px; font-size: 11px; }
+
+  /* AWG table */
+  .awg-table { font-size: 11px; }
+  .awg-table .use-case { display: none; }
+
+  /* Season table */
+  .season-table td:last-child { display: none; }
+
+  /* Module rows */
+  .module-row { padding: 10px 12px; }
+
+  /* Next button */
+  .next-btn { width: 100%; justify-content: center; margin-top: 1rem; }
+
+  /* Fuse locations */
+  .fuse-loc { flex-direction: row; }
+
+  /* Result bar */
+  .result-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .result-bar .r-value { font-size: 22px; }
+
+  /* Progress section in sidebar */
+  .progress-section { padding: 12px 16px; }
+}
+
+/* Hide hamburger on desktop */
+.hamburger { display: none; }
 </style>
 </head>
 <body>
@@ -324,7 +434,14 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 </aside>
 
 <main class="main" id="mainArea">
-<div class="topbar"><div class="topbar-breadcrumb">Blueprint &#8250; <strong id="breadcrumb">Dashboard</strong></div><div class="status-chip"><span class="dot"></span><span id="statusText">In Progress</span></div></div>
+<div class="topbar">
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-breadcrumb">Blueprint &#8250; <strong id="breadcrumb">Dashboard</strong></div>
+  <div class="status-chip"><span class="dot"></span><span id="statusText">In Progress</span></div>
+</div>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
 <!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
@@ -882,6 +999,13 @@ const pages=['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','summary']
 const bc={dashboard:'Dashboard',m1:'How Solar Works',m2:'Your Energy Needs',m3:'Battery Bank',m4:'Solar Panels',m5:'Charge Controllers',m6:'Inverters',m7:'Wiring & Safety',m8:'Installation',m9:'Monitoring',summary:'System Summary'};
 const mods=['m1','m2','m3','m4','m5','m6','m7','m8','m9'];
 
+
+function toggleSidebar(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('mobile-overlay');
+  sb.classList.toggle('mobile-open');
+  ov.classList.toggle('show');
+}
 function showPage(id){
   pages.forEach(p=>{const el=document.getElementById('page-'+p);if(el)el.classList.remove('active')});
   const t=document.getElementById('page-'+id);if(t)t.classList.add('active');
@@ -891,6 +1015,11 @@ function showPage(id){
   const idx=mods.indexOf(id);
   if(idx>=0){const pct=Math.round(((idx+1)/mods.length)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%';}
   document.getElementById('mainArea').scrollTo(0,0);
+  // close sidebar on mobile after navigation
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('mobile-overlay');
+  if(sb)sb.classList.remove('mobile-open');
+  if(ov)ov.classList.remove('show');
   updateSummary();
 }
 
