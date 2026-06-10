@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIY Off-Grid Power Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1B3A2D; --green-mid: #2D5A42; --green-light: #3D7A5A;
+    --sage: #C8DDD0; --cream: #F7F3EC; --amber: #E8A020; --amber-light: #F5C060;
+    --slate: #4A5568; --text: #1A1A1A; --border: #E2E8E4; --white: #FFFFFF;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+  .sidebar { width: 252px; min-width: 252px; background: var(--green); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+  .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .sidebar-logo .logo-icon { font-size: 22px; margin-bottom: 5px; }
+  .sidebar-logo h1 { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.3; }
+  .sidebar-logo p { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+  .progress-section { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .progress-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 7px; display: flex; justify-content: space-between; }
+  .progress-label span:last-child { color: var(--amber); font-weight: 600; }
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--amber-light)); border-radius: 2px; transition: width 0.5s ease; }
+  .nav-section { padding: 10px 0; flex: 1; }
+  .nav-group-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); padding: 8px 18px 3px; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 18px; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); }
+  .nav-item.active { background: rgba(232,160,32,0.12); border-left-color: var(--amber); }
+  .nav-item .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-item .nav-text { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 500; flex: 1; line-height: 1.3; }
+  .nav-item.active .nav-text { color: var(--white); }
+  .nav-item .nav-badge { font-size: 9px; background: var(--amber); color: var(--green); padding: 1px 5px; border-radius: 10px; font-weight: 700; }
+  .nav-item .nav-check { font-size: 12px; color: var(--sage); }
+  .main { flex: 1; overflow-y: auto; background: var(--cream); }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 11px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .topbar-breadcrumb { font-size: 12px; color: var(--slate); }
+  .topbar-breadcrumb strong { color: var(--text); }
+  .status-chip { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--slate); background: var(--cream); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); }
+  .status-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
+  .content { padding: 28px 32px; max-width: 840px; display: none; }
+  .content.active { display: block; }
+  .module-header { margin-bottom: 24px; }
+  .module-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--amber); margin-bottom: 7px; }
+  .module-title { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--green); line-height: 1.2; margin-bottom: 10px; }
+  .module-desc { font-size: 14px; color: var(--slate); line-height: 1.6; max-width: 600px; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--green); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); margin-left: 4px; }
+  .info-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 12px; }
+  .info-card p { font-size: 13.5px; line-height: 1.7; color: #333; }
+  .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .component-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; gap: 10px; align-items: flex-start; transition: box-shadow 0.2s; }
+  .component-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .component-icon { font-size: 24px; flex-shrink: 0; }
+  .component-info h4 { font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 700; color: var(--green); margin-bottom: 3px; }
+  .component-info p { font-size: 11.5px; color: var(--slate); line-height: 1.5; }
+  .flow-diagram { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; }
+  .flow-node { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .flow-box { background: var(--green); color: white; border-radius: 8px; padding: 10px 14px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; text-align: center; min-width: 82px; }
+  .flow-box .flow-emoji { font-size: 18px; display: block; margin-bottom: 3px; }
+  .flow-box.amber { background: var(--amber); color: var(--green); }
+  .flow-arrow { font-size: 16px; color: var(--amber); margin: 0 6px; flex-shrink: 0; }
+  .flow-label { font-size: 9px; color: var(--slate); text-align: center; }
+  .calc-card { background: var(--white); border: 2px solid var(--amber); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .calc-header { background: var(--green); padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+  .calc-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 700; color: var(--white); }
+  .calc-header .tool-badge { background: var(--amber); color: var(--green); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .calc-body { padding: 18px; }
+  .calc-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+  .calc-table th { background: var(--cream); color: var(--slate); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 7px 10px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  .calc-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .calc-table tr:last-child td { border-bottom: none; }
+  .calc-table input, .calc-table select { width: 100%; border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; font-size: 12px; font-family: 'Inter', sans-serif; color: var(--text); background: var(--cream); }
+  .calc-table input:focus, .calc-table select:focus { outline: 2px solid var(--amber); border-color: transparent; }
+  .wh-cell { font-weight: 600; color: var(--green); }
+  .add-row-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1px dashed var(--sage); color: var(--green-mid); font-size: 12px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 6px; width: 100%; margin-bottom: 14px; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .add-row-btn:hover { background: var(--sage); }
+  .calc-result { background: var(--green); border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .result-label { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+  .result-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--amber); line-height: 1; }
+  .result-unit { font-size: 13px; color: rgba(255,255,255,0.6); margin-left: 4px; }
+  .result-note { font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .multi-result { background: var(--green); border-radius: 8px; padding: 14px 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .result-block { text-align: center; }
+  .result-block .result-label { display: block; margin-bottom: 4px; }
+  .result-block .result-value { font-size: 20px; }
+  .result-block .result-unit { font-size: 11px; }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tab { padding: 9px 16px; font-size: 12.5px; font-weight: 500; color: var(--slate); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab:hover { color: var(--green); }
+  .tab.active { color: var(--green); border-bottom-color: var(--amber); font-weight: 600; }
+  .tip-box { background: #FFF8E8; border: 1px solid #F5C060; border-left: 4px solid var(--amber); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; display: flex; gap: 10px; }
+  .tip-box .tip-icon { font-size: 16px; flex-shrink: 0; }
+  .tip-box p { font-size: 12.5px; color: #5A4A1A; line-height: 1.5; }
+  .warn-box { background: #FFF5F5; border: 1px solid #FEB2B2; border-left: 4px solid #E53E3E; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; display: flex; gap: 10px; }
+  .warn-box p { font-size: 12.5px; color: #742A2A; line-height: 1.5; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; }
+  .compare-table th { background: var(--green); color: white; padding: 10px 14px; text-align: left; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; }
+  .compare-table th:first-child { background: var(--green-mid); }
+  .compare-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .feature { color: var(--slate); font-weight: 500; }
+  .compare-table .good { color: #276749; font-weight: 600; }
+  .compare-table .bad { color: #9B2C2C; }
+  .compare-table .ok { color: #744210; }
+  .checklist { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: all 0.15s; }
+  .check-item:hover { border-color: var(--amber); }
+  .check-item.checked { background: #F0FFF4; border-color: #9AE6B4; }
+  .check-item .check-box { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.15s; }
+  .check-item.checked .check-box { background: #48BB78; border-color: #48BB78; color: white; font-size: 11px; }
+  .check-item .check-text { font-size: 13px; line-height: 1.5; }
+  .check-item.checked .check-text { color: var(--slate); text-decoration: line-through; }
+  .check-progress { font-size: 12px; color: var(--slate); margin-bottom: 10px; }
+  .check-progress span { font-weight: 700; color: var(--green); }
+  .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .dash-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .dash-card .dash-icon { font-size: 20px; margin-bottom: 7px; }
+  .dash-card h4 { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .dash-card .dash-value { font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; color: var(--green); }
+  .dash-card .dash-sub { font-size: 10.5px; color: var(--slate); margin-top: 2px; }
+  .dash-card.pending .dash-value { color: #CBD5E0; }
+  .modules-list { display: flex; flex-direction: column; gap: 7px; }
+  .module-row { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; }
+  .module-row:hover { border-color: var(--amber); box-shadow: 0 2px 8px rgba(0,0,0,0.06); transform: translateX(2px); }
+  .module-row .mod-num { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: var(--sage); width: 26px; text-align: center; flex-shrink: 0; }
+  .module-row .mod-icon { font-size: 18px; flex-shrink: 0; }
+  .module-row .mod-info { flex: 1; }
+  .module-row .mod-title { font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+  .module-row .mod-desc { font-size: 11px; color: var(--slate); }
+  .module-row .mod-tag { font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+  .tag-calc { background: #FFF3CD; color: #856404; }
+  .tag-lesson { background: #D1ECF1; color: #0C5460; }
+  .nav-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .btn { font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; font-weight: 600; padding: 9px 18px; border-radius: 7px; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-ghost { background: none; border: 1px solid var(--border); color: var(--slate); }
+  .btn-ghost:hover { background: var(--cream); }
+  .btn-primary { background: var(--amber); color: var(--green); display: flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: var(--amber-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(232,160,32,0.3); }
+  .del-btn { background: none; border: none; cursor: pointer; color: #CBD5E0; font-size: 13px; padding: 2px 4px; transition: color 0.15s; }
+  .del-btn:hover { color: #FC8181; }
+  .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  .summary-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .summary-card .s-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate); font-weight: 600; margin-bottom: 6px; }
+  .summary-card .s-value { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--green); }
+  .summary-card .s-unit { font-size: 12px; color: var(--slate); margin-left: 3px; }
+  .summary-card .s-detail { font-size: 11px; color: var(--slate); margin-top: 4px; line-height: 1.4; }
+  .summary-card.complete { border-color: #9AE6B4; background: #F0FFF4; }
+  .export-btn { background: var(--green); color: white; border: none; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; padding: 12px 24px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 8px; transition: all 0.15s; }
+  .export-btn:hover { background: var(--green-mid); }
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <h1>Off-Grid Power Blueprint</h1>
+    <p>DIY Solar for Beginners</p>
+  </div>
+  <div class="progress-section">
+    <div class="progress-label"><span>System Build Progress</span><span id="progressPct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-group-label">Start</div>
+    <div class="nav-item" id="nav-dashboard" onclick="showPage('dashboard')"><span class="nav-icon">🏠</span><span class="nav-text">Dashboard</span></div>
+    <div class="nav-group-label">Learn & Calculate</div>
+    <div class="nav-item" id="nav-m1" onclick="showPage('m1')"><span class="nav-icon">☀️</span><span class="nav-text">How Solar Works</span></div>
+    <div class="nav-item" id="nav-m2" onclick="showPage('m2')"><span class="nav-icon">🔢</span><span class="nav-text">Your Energy Needs</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m3" onclick="showPage('m3')"><span class="nav-icon">🔋</span><span class="nav-text">Battery Bank</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m4" onclick="showPage('m4')"><span class="nav-icon">🔆</span><span class="nav-text">Solar Panels</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m5" onclick="showPage('m5')"><span class="nav-icon">⚙️</span><span class="nav-text">Charge Controllers</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m6" onclick="showPage('m6')"><span class="nav-icon">🔌</span><span class="nav-text">Inverters</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m7" onclick="showPage('m7')"><span class="nav-icon">🔧</span><span class="nav-text">Wiring & Safety</span><span class="nav-badge">TOOL</span></div>
+    <div class="nav-item" id="nav-m8" onclick="showPage('m8')"><span class="nav-icon">🏗️</span><span class="nav-text">Installation</span><span class="nav-badge">LIST</span></div>
+    <div class="nav-item" id="nav-m9" onclick="showPage('m9')"><span class="nav-icon">📊</span><span class="nav-text">Monitoring</span></div>
+    <div class="nav-group-label">Output</div>
+    <div class="nav-item" id="nav-summary" onclick="showPage('summary')"><span class="nav-icon">📋</span><span class="nav-text">System Summary</span></div>
+  </div>
+</aside>
+
+<main class="main" id="mainArea">
+  <div class="topbar">
+    <div class="topbar-breadcrumb">Blueprint › <strong id="breadcrumb">Dashboard</strong></div>
+    <div class="status-chip"><span class="dot"></span><span id="statusText">In Progress</span></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="content active" id="page-dashboard">
+    <div class="module-header">
+      <div class="module-eyebrow">Welcome</div>
+      <div class="module-title">Your Off-Grid System Starts Here</div>
+      <div class="module-desc">Follow the modules in order to learn, calculate, and design your complete off-grid solar system — step by step, no prior experience needed.</div>
+    </div>
+    <div class="dashboard-grid">
+      <div class="dash-card"><div class="dash-icon">⚡</div><h4>Daily Consumption</h4><div class="dash-value pending" id="dv-wh">—</div><div class="dash-sub" id="ds-wh">Complete Module 2</div></div>
+      <div class="dash-card"><div class="dash-icon">🔋</div><h4>Battery Needed</h4><div class="dash-value pending" id="dv-batt">—</div><div class="dash-sub" id="ds-batt">Complete Module 3</div></div>
+      <div class="dash-card"><div class="dash-icon">🔆</div><h4>Solar Array</h4><div class="dash-value pending" id="dv-panel">—</div><div class="dash-sub" id="ds-panel">Complete Module 4</div></div>
+      <div class="dash-card"><div class="dash-icon">⚙️</div><h4>Controller Rating</h4><div class="dash-value pending" id="dv-ctrl">—</div><div class="dash-sub" id="ds-ctrl">Complete Module 5</div></div>
+      <div class="dash-card"><div class="dash-icon">🔌</div><h4>Inverter Size</h4><div class="dash-value pending" id="dv-inv">—</div><div class="dash-sub" id="ds-inv">Complete Module 6</div></div>
+      <div class="dash-card"><div class="dash-icon">🔧</div><h4>Cable Size</h4><div class="dash-value pending" id="dv-cable">—</div><div class="dash-sub" id="ds-cable">Complete Module 7</div></div>
+    </div>
+    <div class="section-title">All Modules</div>
+    <div class="modules-list">
+      <div class="module-row" onclick="showPage('m1')"><span class="mod-num">01</span><span class="mod-icon">☀️</span><div class="mod-info"><div class="mod-title">How Off-Grid Solar Works</div><div class="mod-desc">System overview, components, energy flow</div></div><span class="mod-tag tag-lesson">Lesson</span></div>
+      <div class="module-row" onclick="showPage('m2')"><span class="mod-num">02</span><span class="mod-icon">🔢</span><div class="mod-info"><div class="mod-title">Know Your Energy Needs</div><div class="mod-desc">Calculate your daily consumption in Wh</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m3')"><span class="mod-num">03</span><span class="mod-icon">🔋</span><div class="mod-info"><div class="mod-title">Choosing Your Battery Bank</div><div class="mod-desc">Types, DOD, sizing calculator</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m4')"><span class="mod-num">04</span><span class="mod-icon">🔆</span><div class="mod-info"><div class="mod-title">Sizing Your Solar Panels</div><div class="mod-desc">Panel types, peak sun hours, sizing</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m5')"><span class="mod-num">05</span><span class="mod-icon">⚙️</span><div class="mod-info"><div class="mod-title">Charge Controllers</div><div class="mod-desc">PWM vs MPPT, sizing calculator</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m6')"><span class="mod-num">06</span><span class="mod-icon">🔌</span><div class="mod-info"><div class="mod-title">Inverters</div><div class="mod-desc">Types, continuous vs surge, sizing</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m7')"><span class="mod-num">07</span><span class="mod-icon">🔧</span><div class="mod-info"><div class="mod-title">Wiring, Cables & Safety</div><div class="mod-desc">AWG sizing, fuses and breakers</div></div><span class="mod-tag tag-calc">Calculator</span></div>
+      <div class="module-row" onclick="showPage('m8')"><span class="mod-num">08</span><span class="mod-icon">🏗️</span><div class="mod-info"><div class="mod-title">Installation & Wiring</div><div class="mod-desc">Step-by-step checklist</div></div><span class="mod-tag tag-calc">Checklist</span></div>
+      <div class="module-row" onclick="showPage('m9')"><span class="mod-num">09</span><span class="mod-icon">📊</span><div class="mod-info"><div class="mod-title">Monitoring & Maintenance</div><div class="mod-desc">What to track, maintenance schedule</div></div><span class="mod-tag tag-lesson">Lesson</span></div>
+    </div>
+  </div>
+
+  <!-- M1 -->
+  <div class="content" id="page-m1">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 01 — Foundation</div>
+      <div class="module-title">How Off-Grid Solar Works</div>
+      <div class="module-desc">Before buying anything, understand how the system works as a whole. Every component has one specific job — and they only function correctly when connected in the right order.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">What "Off-Grid" Means</div>
+      <div class="info-card"><p>An off-grid solar system generates and stores its own electricity — completely independent from the utility grid. It relies on solar panels to capture sunlight, batteries to store energy for nighttime or cloudy days, and a set of control components to keep everything balanced and safe. There are no monthly electric bills, but also no grid as a backup. Your system needs to be sized correctly from the start.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-title">The 4 Core Components</div>
+      <div class="component-grid">
+        <div class="component-card"><div class="component-icon">🔆</div><div class="component-info"><h4>Solar Panel</h4><p>Converts sunlight into DC electricity using the photovoltaic effect. Rated in watts, sized to meet your daily energy needs.</p></div></div>
+        <div class="component-card"><div class="component-icon">⚙️</div><div class="component-info"><h4>Charge Controller</h4><p>Sits between the panels and the battery. Prevents overcharging and deep discharge, which would damage the battery.</p></div></div>
+        <div class="component-card"><div class="component-icon">🔋</div><div class="component-info"><h4>Battery Bank</h4><p>Stores energy produced during the day to power your home at night. The most expensive part of the system.</p></div></div>
+        <div class="component-card"><div class="component-icon">🔌</div><div class="component-info"><h4>Inverter</h4><p>Converts DC power from the battery into AC power — compatible with standard appliances like fridges, TVs, and laptops.</p></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Energy Flow</div>
+      <div class="flow-diagram">
+        <div class="flow-node"><div class="flow-box"><span class="flow-emoji">🌞</span>Sunlight</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box"><span class="flow-emoji">🔆</span>Solar Panel</div><div class="flow-label">DC power</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box"><span class="flow-emoji">⚙️</span>Controller</div><div class="flow-label">Regulated DC</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box"><span class="flow-emoji">🔋</span>Battery</div><div class="flow-label">Stored DC</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="flow-box amber"><span class="flow-emoji">🏠</span>Your Home</div><div class="flow-label">via Inverter (AC)</div></div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>Key insight:</strong> Every component must be sized to match the others. A large solar array paired with an undersized battery wastes energy. The modules ahead walk you through sizing each piece correctly — in the right order.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('dashboard')">← Dashboard</button>
+      <button class="btn btn-primary" onclick="showPage('m2')">Next: Your Energy Needs →</button>
+    </div>
+  </div>
+
+  <!-- M2 -->
+  <div class="content" id="page-m2">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 02 — First Step</div>
+      <div class="module-title">Know Your Energy Needs</div>
+      <div class="module-desc">Before choosing any component, you need to know how much electricity you use per day. This single number drives every calculation that follows.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">How to Find Appliance Wattage</div>
+      <div class="info-card"><p>Every appliance has a power label (nameplate) on the back or bottom. Look for the number followed by "W" — that's the wattage. Multiply it by the hours per day you use the appliance to get its daily energy in watt-hours (Wh). For a more accurate reading, use a plug-in wattmeter between the appliance and the outlet.</p></div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">⚡</span><h3>Daily Energy Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Appliance</th><th>Watts</th><th>Qty</th><th>Hrs/day</th><th>Wh/day</th><th></th></tr></thead>
+        <tbody id="appBody">
+          <tr><td><input type="text" value="LED Bulbs" oninput="calcEnergy()"></td><td><input type="number" value="6" min="0" oninput="calcEnergy()"></td><td><input type="number" value="4" min="1" oninput="calcEnergy()"></td><td><input type="number" value="5" step="0.5" min="0" oninput="calcEnergy()"></td><td class="wh-cell">120</td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Ceiling Fan" oninput="calcEnergy()"></td><td><input type="number" value="80" min="0" oninput="calcEnergy()"></td><td><input type="number" value="1" min="1" oninput="calcEnergy()"></td><td><input type="number" value="8" step="0.5" min="0" oninput="calcEnergy()"></td><td class="wh-cell">640</td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Laptop" oninput="calcEnergy()"></td><td><input type="number" value="65" min="0" oninput="calcEnergy()"></td><td><input type="number" value="1" min="1" oninput="calcEnergy()"></td><td><input type="number" value="4" step="0.5" min="0" oninput="calcEnergy()"></td><td class="wh-cell">260</td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="WiFi Router" oninput="calcEnergy()"></td><td><input type="number" value="6" min="0" oninput="calcEnergy()"></td><td><input type="number" value="1" min="1" oninput="calcEnergy()"></td><td><input type="number" value="24" step="0.5" min="0" oninput="calcEnergy()"></td><td class="wh-cell">144</td><td><button class="del-btn" onclick="delRow(this)">✕</button></td></tr>
+        </tbody></table>
+        <button class="add-row-btn" onclick="addRow()">+ Add Appliance</button>
+        <div class="calc-result">
+          <div><div class="result-label">Total Daily Consumption</div><div class="result-note">This number flows into every other calculator</div></div>
+          <div style="text-align:right"><span class="result-value" id="totalWh">1,164</span><span class="result-unit">Wh/day</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>Pro tip:</strong> Add a 20–25% buffer for future appliances and system losses.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m1')">← How Solar Works</button>
+      <button class="btn btn-primary" onclick="showPage('m3')">Next: Battery Bank →</button>
+    </div>
+  </div>
+
+  <!-- M3 -->
+  <div class="content" id="page-m3">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 03 — Storage</div>
+      <div class="module-title">Choosing Your Battery Bank</div>
+      <div class="module-desc">The battery bank is the heart of your system — and its biggest cost. Getting the sizing right means you'll never run out of power, and the batteries will last for years.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Battery Types</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'bt-lifepo4')">LiFePO4 ✓ Best</div>
+        <div class="tab" onclick="switchTab(this,'bt-agm')">AGM / Sealed</div>
+        <div class="tab" onclick="switchTab(this,'bt-fla')">Flooded Lead-Acid</div>
+      </div>
+      <div id="bt-lifepo4"><div class="info-card"><p><strong>Lithium Iron Phosphate (LiFePO4)</strong> is the best choice for most residential systems. It lasts 2,000–5,000 cycles, can be discharged to 80% safely, requires zero maintenance, and needs no ventilation. The higher upfront cost is offset by its much longer lifespan — over 10 years of daily cycling.</p></div></div>
+      <div id="bt-agm" style="display:none"><div class="info-card"><p><strong>AGM (Absorbent Glass Mat)</strong> batteries are sealed, maintenance-free, and spill-proof. Limit discharge to 50% DOD to maximize lifespan. Good for vacation homes where regular maintenance isn't possible.</p></div></div>
+      <div id="bt-fla" style="display:none"><div class="info-card"><p><strong>Flooded Lead-Acid (FLA)</strong> batteries are the cheapest option but require monthly maintenance — checking water levels every 1–3 months. They release hydrogen gas and need ventilation. Best for full-time off-gridders comfortable with hands-on upkeep.</p></div></div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">🔋</span><h3>Battery Bank Sizing Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Daily energy consumption (Wh)</td><td><input type="number" id="b-wh" value="1164" min="0" oninput="calcBattery()"></td></tr>
+          <tr><td>Days of autonomy (cloudy days)</td><td><input type="number" id="b-days" value="2" min="1" max="7" oninput="calcBattery()"></td></tr>
+          <tr><td>System voltage</td><td><select id="b-volt" onchange="calcBattery()"><option value="12">12V</option><option value="24" selected>24V</option><option value="48">48V</option></select></td></tr>
+          <tr><td>Battery chemistry (sets DOD)</td><td><select id="b-dod" onchange="calcBattery()"><option value="0.8">LiFePO4 — 80% DOD</option><option value="0.5" selected>AGM / Sealed — 50% DOD</option><option value="0.5">Flooded Lead-Acid — 50% DOD</option></select></td></tr>
+        </tbody></table>
+        <div class="calc-result">
+          <div><div class="result-label">Minimum Battery Capacity</div><div class="result-note">Round up to nearest available size</div></div>
+          <div style="text-align:right"><span class="result-value" id="b-result">194</span><span class="result-unit">Ah</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m2')">← Energy Needs</button>
+      <button class="btn btn-primary" onclick="showPage('m4')">Next: Solar Panels →</button>
+    </div>
+  </div>
+
+  <!-- M4 -->
+  <div class="content" id="page-m4">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 04 — Generation</div>
+      <div class="module-title">Sizing Your Solar Panels</div>
+      <div class="module-desc">Your panels need to produce enough energy each day to power your home and recharge your batteries. The key variable is how many peak sun hours your location receives.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Panel Types</div>
+      <div class="component-grid">
+        <div class="component-card"><div class="component-icon">⬛</div><div class="component-info"><h4>Monocrystalline ✓ Best</h4><p>17–22% efficiency. Single silicon crystal. Best for limited roof space. Higher cost but longest lifespan. Recommended for most homes.</p></div></div>
+        <div class="component-card"><div class="component-icon">🔷</div><div class="component-info"><h4>Polycrystalline</h4><p>15–17% efficiency. Multiple silicon crystals. Lower cost, slightly larger footprint. Good budget option for homes with ample roof area.</p></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">What Are Peak Sun Hours?</div>
+      <div class="info-card"><p>Peak Sun Hours (PSH) is the number of hours per day when sunlight averages 1,000 W/m². It's not the same as daylight hours — a location may have 12 hours of daylight but only 5 peak sun hours. Use <strong>globalsolaratlas.info</strong> to find your exact value. Most locations range from 3.5 to 6.5 hours. Always use a slightly conservative estimate to size for worst-case months.</p></div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">🔆</span><h3>Solar Panel Sizing Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Daily energy consumption (Wh)</td><td><input type="number" id="p-wh" value="1164" min="0" oninput="calcPanels()"></td></tr>
+          <tr><td>Peak sun hours at your location</td><td><input type="number" id="p-psh" value="4.5" min="1" max="8" step="0.1" oninput="calcPanels()"></td></tr>
+          <tr><td>System efficiency loss</td><td><select id="p-eff" onchange="calcPanels()"><option value="0.75">25% loss — conservative</option><option value="0.80" selected>20% loss — typical</option><option value="0.85">15% loss — clean, unshaded</option></select></td></tr>
+          <tr><td>Individual panel wattage</td><td><select id="p-size" onchange="calcPanels()"><option value="100">100W</option><option value="200">200W</option><option value="250">250W</option><option value="300">300W</option><option value="400" selected>400W</option><option value="500">500W</option></select></td></tr>
+        </tbody></table>
+        <div class="multi-result">
+          <div class="result-block"><div class="result-label">Total Power Needed</div><span class="result-value" id="p-watts">323</span><span class="result-unit">W</span></div>
+          <div class="result-block"><div class="result-label">Number of Panels</div><span class="result-value" id="p-count">1</span><span class="result-unit">panels</span></div>
+          <div class="result-block"><div class="result-label">Actual System Size</div><span class="result-value" id="p-actual">400</span><span class="result-unit">W</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>PSH tip:</strong> Go to globalsolaratlas.info, search your location, select "Small Residential" and read the "Daily Average" value. Use a number 10–15% lower than the annual average to account for your worst winter months.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m3')">← Battery Bank</button>
+      <button class="btn btn-primary" onclick="showPage('m5')">Next: Charge Controllers →</button>
+    </div>
+  </div>
+
+  <!-- M5 -->
+  <div class="content" id="page-m5">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 05 — Control</div>
+      <div class="module-title">Charge Controllers</div>
+      <div class="module-desc">The charge controller is the gatekeeper between your panels and your battery. Choose the wrong type and you could lose 20–30% of your panel's potential power every single day.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">PWM vs MPPT</div>
+      <table class="compare-table">
+        <thead><tr><th>Feature</th><th>PWM</th><th>MPPT ✓ Recommended</th></tr></thead>
+        <tbody>
+          <tr><td class="feature">Efficiency</td><td class="ok">~75–80%</td><td class="good">94–99%</td></tr>
+          <tr><td class="feature">Works best when</td><td class="ok">Panel V ≈ Battery V</td><td class="good">Panel V &gt; Battery V</td></tr>
+          <tr><td class="feature">Cost</td><td class="good">Lower (1/3 of MPPT)</td><td class="bad">Higher (2–3× PWM)</td></tr>
+          <tr><td class="feature">60/72-cell panels</td><td class="bad">Not compatible</td><td class="good">Fully compatible</td></tr>
+          <tr><td class="feature">Best for</td><td class="ok">Small budgets, &lt;200W</td><td class="good">Homes, most systems</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">⚙️</span><h3>Charge Controller Sizing Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Total solar array wattage (W)</td><td><input type="number" id="c-watts" value="400" min="0" oninput="calcController()"></td></tr>
+          <tr><td>System voltage (V)</td><td><select id="c-volt" onchange="calcController()"><option value="12">12V</option><option value="24" selected>24V</option><option value="48">48V</option></select></td></tr>
+        </tbody></table>
+        <div class="multi-result">
+          <div class="result-block"><div class="result-label">Max Current</div><span class="result-value" id="c-raw">16.7</span><span class="result-unit">A</span></div>
+          <div class="result-block"><div class="result-label">With Safety ×1.3</div><span class="result-value" id="c-safe">21.7</span><span class="result-unit">A</span></div>
+          <div class="result-block"><div class="result-label">Select Controller ≥</div><span class="result-value" id="c-select">30</span><span class="result-unit">A</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>Formula:</strong> Controller Amps = (Panel Watts ÷ System Voltage) × 1.3. The 1.3 safety factor accounts for bright conditions like snow reflection that can temporarily boost panel output beyond its rated power.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m4')">← Solar Panels</button>
+      <button class="btn btn-primary" onclick="showPage('m6')">Next: Inverters →</button>
+    </div>
+  </div>
+
+  <!-- M6 -->
+  <div class="content" id="page-m6">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 06 — Conversion</div>
+      <div class="module-title">Inverters</div>
+      <div class="module-desc">The inverter converts DC battery power into AC power for your home appliances. Choosing the wrong type can damage sensitive electronics over time.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Inverter Types</div>
+      <div class="component-grid">
+        <div class="component-card"><div class="component-icon">〰️</div><div class="component-info"><h4>Pure Sine Wave ✓ Required</h4><p>Produces clean AC identical to grid power. Works with all appliances — fridges, motors, medical equipment, sensitive electronics. Always choose this type.</p></div></div>
+        <div class="component-card"><div class="component-icon">⊓⊔</div><div class="component-info"><h4>Modified Sine Wave ✗ Avoid</h4><p>Cheaper but produces a stepped waveform that damages motors, fridges, microwave ovens, and sensitive electronics over time. Not recommended.</p></div></div>
+      </div>
+    </div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">🔌</span><h3>Inverter Sizing Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Appliance</th><th>Watts</th><th>Surge ×</th><th>Surge W</th><th></th></tr></thead>
+        <tbody id="invBody">
+          <tr><td><input type="text" value="LED Lights" oninput="calcInverter()"></td><td><input type="number" value="24" min="0" oninput="calcInverter()"></td><td><input type="number" value="1" min="1" step="0.1" oninput="calcInverter()"></td><td class="wh-cell">24</td><td><button class="del-btn" onclick="delInvRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Ceiling Fan" oninput="calcInverter()"></td><td><input type="number" value="80" min="0" oninput="calcInverter()"></td><td><input type="number" value="2.5" min="1" step="0.1" oninput="calcInverter()"></td><td class="wh-cell">200</td><td><button class="del-btn" onclick="delInvRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Laptop" oninput="calcInverter()"></td><td><input type="number" value="65" min="0" oninput="calcInverter()"></td><td><input type="number" value="1" min="1" step="0.1" oninput="calcInverter()"></td><td class="wh-cell">65</td><td><button class="del-btn" onclick="delInvRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="WiFi Router" oninput="calcInverter()"></td><td><input type="number" value="6" min="0" oninput="calcInverter()"></td><td><input type="number" value="1" min="1" step="0.1" oninput="calcInverter()"></td><td class="wh-cell">6</td><td><button class="del-btn" onclick="delInvRow(this)">✕</button></td></tr>
+        </tbody></table>
+        <button class="add-row-btn" onclick="addInvRow()">+ Add Appliance</button>
+        <div class="multi-result">
+          <div class="result-block"><div class="result-label">Continuous Load</div><span class="result-value" id="inv-cont">175</span><span class="result-unit">W</span></div>
+          <div class="result-block"><div class="result-label">Peak Surge</div><span class="result-value" id="inv-surge">295</span><span class="result-unit">W</span></div>
+          <div class="result-block"><div class="result-label">Min Inverter Size</div><span class="result-value" id="inv-min">500</span><span class="result-unit">W</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>Surge multipliers:</strong> Lights & electronics = 1×, ceiling fans = 2.5×, refrigerators = 3×, water pumps = 5–7×. When in doubt, use the higher multiplier — oversizing the inverter is always safer than undersizing it.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m5')">← Charge Controllers</button>
+      <button class="btn btn-primary" onclick="showPage('m7')">Next: Wiring & Safety →</button>
+    </div>
+  </div>
+
+  <!-- M7 -->
+  <div class="content" id="page-m7">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 07 — Connections</div>
+      <div class="module-title">Wiring, Cables & Safety</div>
+      <div class="module-desc">Undersized cables and missing fuses are the leading cause of off-grid system fires. This module ensures every wire and protective device is correctly rated for your system.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Where Fuses Must Be Installed</div>
+      <div class="info-card"><p>NEC requires fuses or breakers at three locations: <strong>(1)</strong> between solar panels and charge controller, <strong>(2)</strong> between charge controller and battery bank, and <strong>(3)</strong> between battery bank and inverter. A fourth breaker at the inverter AC output is also strongly recommended.</p></div>
+    </div>
+    <div class="warn-box"><span style="font-size:16px;flex-shrink:0">⚠️</span><p><strong>Safety rule:</strong> Always connect the battery last and disconnect it first. Reverse polarity on DC systems can instantly destroy your charge controller and inverter. Use red for positive (+) and black for negative (−) throughout.</p></div>
+    <div class="calc-card">
+      <div class="calc-header"><span style="font-size:17px">🔧</span><h3>Fuse & Cable Sizing Calculator</h3><span class="tool-badge">Interactive Tool</span></div>
+      <div class="calc-body">
+        <table class="calc-table"><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Circuit type</td><td><select id="w-type" onchange="calcWiring()"><option value="dc-pv">DC — Panel to Controller (use Isc)</option><option value="dc-batt" selected>DC — Battery to Inverter</option><option value="ac-out">AC — Inverter Output</option></select></td></tr>
+          <tr><td id="w-label">Inverter wattage (W)</td><td><input type="number" id="w-current" value="500" min="0" oninput="calcWiring()"></td></tr>
+          <tr><td>System voltage</td><td><select id="w-volt" onchange="calcWiring()"><option value="12">12V</option><option value="24" selected>24V</option><option value="120">120V AC</option><option value="230">230V AC</option></select></td></tr>
+        </tbody></table>
+        <div class="multi-result">
+          <div class="result-block"><div class="result-label">Max Current</div><span class="result-value" id="w-amps">20.8</span><span class="result-unit">A</span></div>
+          <div class="result-block"><div class="result-label">Fuse Rating</div><span class="result-value" id="w-fuse">32</span><span class="result-unit">A</span></div>
+          <div class="result-block"><div class="result-label">Min Cable Size</div><span class="result-value" id="w-awg">10 AWG</span><span class="result-unit"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box"><span class="tip-icon">💡</span><p><strong>Formulas used:</strong> DC fuse = Isc × 1.56 (NEC). AC fuse = Max AC output × 1.25 (NEC). Battery-to-inverter = (Inverter W ÷ Battery V) × 1.56. Always round up to the next standard fuse size available.</p></div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m6')">← Inverters</button>
+      <button class="btn btn-primary" onclick="showPage('m8')">Next: Installation →</button>
+    </div>
+  </div>
+
+  <!-- M8 -->
+  <div class="content" id="page-m8">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 08 — Build</div>
+      <div class="module-title">Installation & Wiring Order</div>
+      <div class="module-desc">Never connect components in random order. Follow this checklist strictly — connecting the battery first or with wrong polarity can destroy your entire system instantly.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Correct Wiring Sequence</div>
+      <div class="info-card"><p>Always wire your system in this order: <strong>1. Mount panels</strong> (do not connect yet) → <strong>2. Mount and wire charge controller</strong> → <strong>3. Connect battery to controller</strong> → <strong>4. Connect panels to controller</strong> → <strong>5. Connect inverter to battery</strong> → <strong>6. Connect loads</strong>. Reverse this order when disconnecting for maintenance.</p></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Pre-Startup Safety Checklist</div>
+      <div class="check-progress">Completed: <span id="checkCount">0</span> / <span id="checkTotal">12</span> items</div>
+      <div class="checklist" id="checklist">
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">All cables are correctly sized for the current they will carry</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Red cables connected to positive (+) terminals, black to negative (−) throughout</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">All 3 required DC fuses/breakers installed (Panel→Controller, Controller→Battery, Battery→Inverter)</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">AC breaker installed at inverter output</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">All MC4 connectors fully seated and locked on panel cables</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">All terminal screws tightened with a screwdriver (no loose connections)</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Solar panels covered or facing away from sun before connecting to controller</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Battery voltage confirmed with multimeter before connecting to controller</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">System voltage (12/24/48V) set correctly on charge controller</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Battery type set correctly on charge controller (Lead-Acid / Lithium)</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">Temperature sensor connected to charge controller and placed on battery</div></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-text">No tools or loose metal left on or near any electrical component</div></div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m7')">← Wiring & Safety</button>
+      <button class="btn btn-primary" onclick="showPage('m9')">Next: Monitoring →</button>
+    </div>
+  </div>
+
+  <!-- M9 -->
+  <div class="content" id="page-m9">
+    <div class="module-header">
+      <div class="module-eyebrow">Module 09 — Operations</div>
+      <div class="module-title">Monitoring & Maintenance</div>
+      <div class="module-desc">A well-maintained system lasts decades. Knowing what to watch for keeps your batteries healthy and your home powered even during extended cloudy stretches.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">What to Monitor</div>
+      <div class="component-grid">
+        <div class="component-card"><div class="component-icon">🌡️</div><div class="component-info"><h4>Battery Temperature</h4><p>A temperature sensor connected to your charge controller automatically adjusts charge voltage to compensate for heat or cold — extending battery life significantly.</p></div></div>
+        <div class="component-card"><div class="component-icon">⚡</div><div class="component-info"><h4>State of Charge (SOC)</h4><p>Track your battery percentage daily. If it rarely reaches 80% or frequently drops below your DOD limit, your system may be undersized for your actual usage.</p></div></div>
+        <div class="component-card"><div class="component-icon">📡</div><div class="component-info"><h4>Remote Monitoring</h4><p>Most quality MPPT controllers support WiFi adapters (like eBox-WiFi) and remote meters, letting you monitor production and battery status from your phone in real time.</p></div></div>
+        <div class="component-card"><div class="component-icon">🌫️</div><div class="component-info"><h4>Panel Cleanliness</h4><p>Dust and bird droppings can reduce panel output by 15–25%. Check and clean monthly in dry climates, quarterly in wet areas. Use a soft cloth and water — no abrasives.</p></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Monthly Maintenance Checklist</div>
+      <div class="check-progress">Completed: <span id="maintCount">0</span> / <span id="maintTotal">6</span> items</div>
+      <div class="checklist" id="maintList">
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">Clean solar panels with soft cloth and water</div></div>
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">Inspect all cable connections for corrosion or looseness</div></div>
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">Check charge controller display for any error codes</div></div>
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">Verify battery is reaching full charge on sunny days</div></div>
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">Check for any new shading from vegetation or structures</div></div>
+        <div class="check-item" onclick="toggleMaint(this)"><div class="check-box"></div><div class="check-text">(Flooded Lead-Acid only) Check electrolyte water levels</div></div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m8')">← Installation</button>
+      <button class="btn btn-primary" onclick="showPage('summary')">View My System Summary →</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="content" id="page-summary">
+    <div class="module-header">
+      <div class="module-eyebrow">Your Complete System</div>
+      <div class="module-title">System Summary</div>
+      <div class="module-desc">Your off-grid solar system specification based on the values entered throughout the blueprint.</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card" id="sum-wh"><div class="s-label">Daily Consumption</div><div><span class="s-value" id="s-wh">—</span><span class="s-unit">Wh/day</span></div><div class="s-detail" id="sd-wh">Complete Module 2 to populate</div></div>
+      <div class="summary-card" id="sum-batt"><div class="s-label">Battery Bank</div><div><span class="s-value" id="s-batt">—</span><span class="s-unit">Ah</span></div><div class="s-detail" id="sd-batt">Complete Module 3 to populate</div></div>
+      <div class="summary-card" id="sum-panel"><div class="s-label">Solar Array</div><div><span class="s-value" id="s-panel">—</span><span class="s-unit">W</span></div><div class="s-detail" id="sd-panel">Complete Module 4 to populate</div></div>
+      <div class="summary-card" id="sum-ctrl"><div class="s-label">Charge Controller</div><div><span class="s-value" id="s-ctrl">—</span><span class="s-unit">A</span></div><div class="s-detail" id="sd-ctrl">Complete Module 5 to populate</div></div>
+      <div class="summary-card" id="sum-inv"><div class="s-label">Inverter</div><div><span class="s-value" id="s-inv">—</span><span class="s-unit">W</span></div><div class="s-detail" id="sd-inv">Complete Module 6 to populate</div></div>
+      <div class="summary-card" id="sum-fuse"><div class="s-label">Main DC Fuse</div><div><span class="s-value" id="s-fuse">—</span><span class="s-unit">A</span></div><div class="s-detail" id="sd-fuse">Complete Module 7 to populate</div></div>
+    </div>
+    <button class="export-btn" onclick="exportSummary()">📋 Copy System Spec to Clipboard</button>
+    <div class="nav-buttons">
+      <button class="btn btn-ghost" onclick="showPage('m9')">← Monitoring</button>
+      <button class="btn btn-primary" onclick="showPage('dashboard')">↺ Back to Dashboard</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const state = { wh:0, battAh:0, battVolt:24, panelW:0, panelCount:0, ctrlA:0, invW:0, fuseA:0 };
+const pages = ['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','summary'];
+const breadcrumbs = { dashboard:'Dashboard', m1:'How Solar Works', m2:'Your Energy Needs', m3:'Battery Bank', m4:'Solar Panels', m5:'Charge Controllers', m6:'Inverters', m7:'Wiring & Safety', m8:'Installation', m9:'Monitoring', summary:'System Summary' };
+const modulePages = ['m1','m2','m3','m4','m5','m6','m7','m8','m9'];
+
+function showPage(id) {
+  pages.forEach(p => { const el = document.getElementById('page-'+p); if(el) el.classList.remove('active'); });
+  const t = document.getElementById('page-'+id); if(t) t.classList.add('active');
+  document.getElementById('breadcrumb').textContent = breadcrumbs[id]||id;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const ni = document.getElementById('nav-'+id); if(ni) ni.classList.add('active');
+  const idx = modulePages.indexOf(id);
+  if(idx >= 0) { const pct = Math.round(((idx+1)/modulePages.length)*100); document.getElementById('progressFill').style.width=pct+'%'; document.getElementById('progressPct').textContent=pct+'%'; }
+  document.getElementById('mainArea').scrollTo(0,0);
+  updateSummary();
+}
+
+function calcEnergy() {
+  const rows = document.querySelectorAll('#appBody tr'); let total = 0;
+  rows.forEach(row => { const ins = row.querySelectorAll('input[type="number"]'); if(ins.length<3) return; const w=parseFloat(ins[0].value)||0, q=parseFloat(ins[1].value)||1, h=parseFloat(ins[2].value)||0, wh=w*q*h; total+=wh; const cell=row.querySelector('.wh-cell'); if(cell) cell.textContent=wh.toLocaleString('en',{maximumFractionDigits:0}); });
+  document.getElementById('totalWh').textContent = total.toLocaleString('en',{maximumFractionDigits:0});
+  state.wh = total;
+  document.getElementById('b-wh').value = Math.round(total);
+  document.getElementById('p-wh').value = Math.round(total);
+  calcBattery(); calcPanels();
+  updateDash('wh', total.toLocaleString('en',{maximumFractionDigits:0})+' Wh', 'Module 2 complete ✓');
+}
+
+function addRow() {
+  const tbody = document.getElementById('appBody'), row = document.createElement('tr');
+  row.innerHTML = `<td><input type="text" value="Appliance" oninput="calcEnergy()"></td><td><input type="number" value="50" min="0" oninput="calcEnergy()"></td><td><input type="number" value="1" min="1" oninput="calcEnergy()"></td><td><input type="number" value="4" step="0.5" min="0" oninput="calcEnergy()"></td><td class="wh-cell">200</td><td><button class="del-btn" onclick="delRow(this)">✕</button></td>`;
+  tbody.appendChild(row); calcEnergy();
+}
+function delRow(btn) { btn.closest('tr').remove(); calcEnergy(); }
+
+function calcBattery() {
+  const wh=parseFloat(document.getElementById('b-wh').value)||0, days=parseFloat(document.getElementById('b-days').value)||1, volt=parseFloat(document.getElementById('b-volt').value)||24, dod=parseFloat(document.getElementById('b-dod').value)||0.5;
+  const result = Math.ceil((wh*days)/(volt*dod));
+  document.getElementById('b-result').textContent = result.toLocaleString('en');
+  state.battAh=result; state.battVolt=volt;
+  updateDash('batt', result+' Ah', 'Module 3 complete ✓');
+}
+
+function calcPanels() {
+  const wh=parseFloat(document.getElementById('p-wh').value)||0, psh=parseFloat(document.getElementById('p-psh').value)||4.5, eff=parseFloat(document.getElementById('p-eff').value)||0.8, psize=parseFloat(document.getElementById('p-size').value)||400;
+  const needed=wh/(psh*eff), count=Math.ceil(needed/psize), actual=count*psize;
+  document.getElementById('p-watts').textContent = Math.round(needed).toLocaleString('en');
+  document.getElementById('p-count').textContent = count;
+  document.getElementById('p-actual').textContent = actual.toLocaleString('en');
+  state.panelW=actual; state.panelCount=count;
+  document.getElementById('c-watts').value = actual;
+  calcController();
+  updateDash('panel', actual+'W ('+count+' panels)', 'Module 4 complete ✓');
+}
+
+function calcController() {
+  const watts=parseFloat(document.getElementById('c-watts').value)||0, volt=parseFloat(document.getElementById('c-volt').value)||24;
+  const raw=watts/volt, safe=raw*1.3;
+  const standards=[10,15,20,30,40,50,60,80,100], select=standards.find(s=>s>=safe)||100;
+  document.getElementById('c-raw').textContent = raw.toFixed(1);
+  document.getElementById('c-safe').textContent = safe.toFixed(1);
+  document.getElementById('c-select').textContent = select;
+  state.ctrlA=select;
+  updateDash('ctrl', select+'A MPPT', 'Module 5 complete ✓');
+}
+
+function calcInverter() {
+  const rows = document.querySelectorAll('#invBody tr'); let cont=0, maxSurge=0;
+  rows.forEach(row => { const ins=row.querySelectorAll('input[type="number"]'); if(ins.length<2) return; const w=parseFloat(ins[0].value)||0, s=parseFloat(ins[1].value)||1, sw=w*s; const cell=row.querySelector('.wh-cell'); if(cell) cell.textContent=Math.round(sw); cont+=w; if(sw>maxSurge) maxSurge=sw; });
+  const totalSurge = cont - (cont>0 ? Math.min(...[...document.querySelectorAll('#invBody tr')].map(r=>{ const ins=r.querySelectorAll('input[type="number"]'); return parseFloat(ins[0]?.value)||0; })) : 0) + maxSurge;
+  const standards=[300,500,600,1000,1200,1500,2000,3000,5000], selected=standards.find(s=>s>=totalSurge)||5000;
+  document.getElementById('inv-cont').textContent = Math.round(cont);
+  document.getElementById('inv-surge').textContent = Math.round(totalSurge);
+  document.getElementById('inv-min').textContent = selected;
+  state.invW=selected;
+  document.getElementById('w-current').value = selected;
+  calcWiring();
+  updateDash('inv', selected+'W Pure Sine', 'Module 6 complete ✓');
+}
+
+function addInvRow() {
+  const tbody=document.getElementById('invBody'), row=document.createElement('tr');
+  row.innerHTML=`<td><input type="text" value="Appliance" oninput="calcInverter()"></td><td><input type="number" value="100" min="0" oninput="calcInverter()"></td><td><input type="number" value="1" min="1" step="0.1" oninput="calcInverter()"></td><td class="wh-cell">100</td><td><button class="del-btn" onclick="delInvRow(this)">✕</button></td>`;
+  tbody.appendChild(row); calcInverter();
+}
+function delInvRow(btn) { btn.closest('tr').remove(); calcInverter(); }
+
+function calcWiring() {
+  const type=document.getElementById('w-type').value, current=parseFloat(document.getElementById('w-current').value)||0, volt=parseFloat(document.getElementById('w-volt').value)||24;
+  const label=document.getElementById('w-label');
+  let amps, fuse;
+  if(type==='dc-pv') { label.textContent='Panel short-circuit current Isc (A)'; amps=current; fuse=Math.ceil(current*1.56); }
+  else if(type==='dc-batt') { label.textContent='Inverter wattage (W)'; amps=current/volt; fuse=Math.ceil(amps*1.56); }
+  else { label.textContent='Inverter AC output current (A)'; amps=current; fuse=Math.ceil(current*1.25); }
+  const fuses=[10,15,20,30,40,50,60,80,100,125,150,200], selectedFuse=fuses.find(f=>f>=fuse)||200;
+  const awgTable=[[15,'14'],[20,'12'],[30,'10'],[55,'8'],[70,'6'],[95,'4'],[130,'2'],[170,'1/0'],[220,'2/0'],[300,'4/0']], awgEntry=awgTable.find(e=>e[0]>=selectedFuse)||['','4/0'];
+  document.getElementById('w-amps').textContent = amps.toFixed(1);
+  document.getElementById('w-fuse').textContent = selectedFuse;
+  document.getElementById('w-awg').textContent = awgEntry[1]+' AWG';
+  state.fuseA=selectedFuse;
+  updateDash('cable', awgEntry[1]+' AWG / '+selectedFuse+'A', 'Module 7 complete ✓');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  el.querySelector('.check-box').textContent = el.classList.contains('checked') ? '✓' : '';
+  document.getElementById('checkCount').textContent = document.querySelectorAll('#checklist .check-item.checked').length;
+}
+function toggleMaint(el) {
+  el.classList.toggle('checked');
+  el.querySelector('.check-box').textContent = el.classList.contains('checked') ? '✓' : '';
+  document.getElementById('maintCount').textContent = document.querySelectorAll('#maintList .check-item.checked').length;
+}
+
+function switchTab(el, id) {
+  el.closest('.section').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['bt-lifepo4','bt-agm','bt-fla'].forEach(t=>{ const e=document.getElementById(t); if(e) e.style.display='none'; });
+  const target=document.getElementById(id); if(target) target.style.display='block';
+}
+
+function updateDash(key, value, sub) {
+  const valEl=document.getElementById('dv-'+key), subEl=document.getElementById('ds-'+key);
+  if(valEl) { valEl.textContent=value; valEl.style.color='var(--green)'; valEl.classList.remove('pending'); }
+  if(subEl) subEl.textContent=sub;
+}
+
+function updateSummary() {
+  if(state.wh>0) { document.getElementById('s-wh').textContent=state.wh.toLocaleString('en',{maximumFractionDigits:0}); document.getElementById('sd-wh').textContent='From Module 2 calculator'; document.getElementById('sum-wh').classList.add('complete'); }
+  if(state.battAh>0) { document.getElementById('s-batt').textContent=state.battAh; document.getElementById('sd-batt').textContent='At '+state.battVolt+'V system voltage'; document.getElementById('sum-batt').classList.add('complete'); }
+  if(state.panelW>0) { document.getElementById('s-panel').textContent=state.panelW; document.getElementById('sd-panel').textContent=state.panelCount+' panels in array'; document.getElementById('sum-panel').classList.add('complete'); }
+  if(state.ctrlA>0) { document.getElementById('s-ctrl').textContent=state.ctrlA; document.getElementById('sd-ctrl').textContent='MPPT controller minimum rating'; document.getElementById('sum-ctrl').classList.add('complete'); }
+  if(state.invW>0) { document.getElementById('s-inv').textContent=state.invW; document.getElementById('sd-inv').textContent='Pure Sine Wave, '+state.battVolt+'V input'; document.getElementById('sum-inv').classList.add('complete'); }
+  if(state.fuseA>0) { document.getElementById('s-fuse').textContent=state.fuseA; document.getElementById('sd-fuse').textContent='Battery-to-inverter circuit'; document.getElementById('sum-fuse').classList.add('complete'); }
+}
+
+function exportSummary() {
+  const txt=`DIY Off-Grid Solar System Specification\n${'─'.repeat(40)}\nDaily Consumption: ${state.wh} Wh/day\nBattery Bank: ${state.battAh} Ah @ ${state.battVolt}V\nSolar Array: ${state.panelW}W (${state.panelCount} panels)\nCharge Controller: ${state.ctrlA}A MPPT\nInverter: ${state.invW}W Pure Sine Wave\nMain DC Fuse (Batt→Inverter): ${state.fuseA}A\n${'─'.repeat(40)}\nGenerated by DIY Off-Grid Power Blueprint`;
+  navigator.clipboard.writeText(txt).then(()=>{ const btn=document.querySelector('.export-btn'); btn.textContent='✓ Copied!'; setTimeout(()=>{ btn.textContent='📋 Copy System Spec to Clipboard'; },2500); });
+}
+
+// Init
+calcEnergy(); calcBattery(); calcPanels(); calcController(); calcInverter(); calcWiring();
+document.getElementById('checkTotal').textContent = document.querySelectorAll('#checklist .check-item').length;
+document.getElementById('maintTotal').textContent = document.querySelectorAll('#maintList .check-item').length;
+showPage('dashboard');
+</script>
+</body>
+</html>
