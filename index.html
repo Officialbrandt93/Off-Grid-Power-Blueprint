@@ -416,6 +416,36 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
   .topbar { display: none; }
 
 }
+
+/* COMPONENTS PAGE */
+.comp-gallery { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-bottom: 1rem; }
+.comp-tile { background: var(--white); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .2s; }
+.comp-tile:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+.comp-tile.active { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber); }
+.comp-tile-img { width: 100%; height: 130px; object-fit: cover; background: var(--cream); display: block; }
+.comp-tile-img-placeholder { width: 100%; height: 130px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.comp-tile-body { padding: 10px 12px; }
+.comp-tile-cat { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--amber); margin-bottom: 3px; }
+.comp-tile-name { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.comp-detail-panel { background: var(--white); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; display: none; }
+.comp-detail-panel.show { display: flex; gap: 20px; align-items: flex-start; }
+.comp-detail-img { width: 180px; min-width: 180px; height: 140px; object-fit: cover; border-radius: 8px; background: var(--cream); }
+.comp-detail-img-placeholder { width: 180px; min-width: 180px; height: 140px; border-radius: 8px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 52px; }
+.comp-detail-info { flex: 1; }
+.comp-detail-cat { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--amber); margin-bottom: 4px; }
+.comp-detail-name { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--green); margin-bottom: 8px; line-height: 1.2; }
+.comp-detail-desc { font-size: 13.5px; color: var(--slate); line-height: 1.65; margin-bottom: 10px; }
+.comp-detail-tip { background: var(--bg-warning); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-warning); line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; }
+.cat-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.cat-btn { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--border); background: var(--white); color: var(--slate); cursor: pointer; transition: all .15s; }
+.cat-btn:hover { border-color: var(--amber); color: var(--text); }
+.cat-btn.active { background: var(--amber); color: var(--green); border-color: var(--amber); font-weight: 600; }
+@media (max-width: 768px) {
+  .comp-gallery { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .comp-detail-panel.show { flex-direction: column; }
+  .comp-detail-img, .comp-detail-img-placeholder { width: 100%; min-width: unset; height: 180px; }
+  .comp-tile-img, .comp-tile-img-placeholder { height: 100px; }
+}
 </style>
 </head>
 <body>
@@ -436,6 +466,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
     <div class="nav-item" id="nav-m8" onclick="showPage('m8')"><span class="nav-icon">&#127959;</span><span class="nav-text">Installation</span><span class="nav-badge">LIST</span></div>
     <div class="nav-item" id="nav-m9" onclick="showPage('m9')"><span class="nav-icon">&#128202;</span><span class="nav-text">Monitoring</span></div>
     <div class="nav-group-label">Output</div>
+    <div class="nav-item" id="nav-components" onclick="showPage('components')"><span class="nav-icon">&#128269;</span><span class="nav-text">Component Guide</span></div>
     <div class="nav-item" id="nav-summary" onclick="showPage('summary')"><span class="nav-icon">&#128203;</span><span class="nav-text">System Summary</span></div>
   </div>
 </aside>
@@ -991,6 +1022,119 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 <div style="display:flex;justify-content:flex-end"><button class="next-btn primary" onclick="showPage('summary')">View my system summary &#8594;</button></div>
 </div>
 
+
+<!-- COMPONENTS PAGE -->
+<div class="page" id="page-components">
+<div class="mod-header">
+  <div class="mod-eyebrow">Visual Reference</div>
+  <div class="mod-title">Component Guide</div>
+  <div class="mod-desc">Not sure what something looks like? Click any component to see a photo and learn exactly what it does and why you need it.</div>
+</div>
+
+<div class="cat-filter">
+  <button class="cat-btn active" onclick="filterCat('all',this)">All (12)</button>
+  <button class="cat-btn" onclick="filterCat('Generation',this)">Generation</button>
+  <button class="cat-btn" onclick="filterCat('Storage',this)">Storage</button>
+  <button class="cat-btn" onclick="filterCat('Control',this)">Control</button>
+  <button class="cat-btn" onclick="filterCat('Conversion',this)">Conversion</button>
+  <button class="cat-btn" onclick="filterCat('Wiring',this)">Wiring</button>
+  <button class="cat-btn" onclick="filterCat('Safety',this)">Safety</button>
+  <button class="cat-btn" onclick="filterCat('Monitoring',this)">Monitoring</button>
+  <button class="cat-btn" onclick="filterCat('Structure',this)">Structure</button>
+</div>
+
+<div class="comp-detail-panel" id="comp-detail-panel">
+  <img class="comp-detail-img" id="cdp-img" src="" alt="" onerror="this.style.display='none';document.getElementById('cdp-placeholder').style.display='flex'">
+  <div class="comp-detail-img-placeholder" id="cdp-placeholder" style="display:none">&#128269;</div>
+  <div class="comp-detail-info">
+    <div class="comp-detail-cat" id="cdp-cat"></div>
+    <div class="comp-detail-name" id="cdp-name"></div>
+    <div class="comp-detail-desc" id="cdp-desc"></div>
+    <div class="comp-detail-tip"><span style="font-size:14px;flex-shrink:0">&#128161;</span><span id="cdp-tip"></span></div>
+  </div>
+</div>
+
+<div class="comp-gallery" id="comp-gallery">
+
+  <div class="comp-tile" data-cat="Generation" data-id="0" onclick="selectComp(0)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Photovoltaik_Dachanlage_Hannover_-_Schwarze_Heide_-_1_MW.jpg/320px-Photovoltaik_Dachanlage_Hannover_-_Schwarze_Heide_-_1_MW.jpg" alt="Solar Panel" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128262;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Generation</div><div class="comp-tile-name">Solar Panel</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Control" data-id="1" onclick="selectComp(1)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Morningstar_ProStar_PS-30M_solar_charge_controller.jpg/320px-Morningstar_ProStar_PS-30M_solar_charge_controller.jpg" alt="Charge Controller" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#9881;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Control</div><div class="comp-tile-name">MPPT Charge Controller</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Storage" data-id="2" onclick="selectComp(2)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Lifepo4_battery_pack.jpg/320px-Lifepo4_battery_pack.jpg" alt="LiFePO4 Battery" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128267;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Storage</div><div class="comp-tile-name">LiFePO4 Battery</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Conversion" data-id="3" onclick="selectComp(3)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Xantrex_RS2000_inverter.jpg/320px-Xantrex_RS2000_inverter.jpg" alt="Inverter" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128268;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Conversion</div><div class="comp-tile-name">Pure Sine Wave Inverter</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Wiring" data-id="4" onclick="selectComp(4)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/MC4_connectors.jpg/320px-MC4_connectors.jpg" alt="MC4 Connectors" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128269;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Wiring</div><div class="comp-tile-name">MC4 Connectors</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Wiring" data-id="5" onclick="selectComp(5)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Solarkabel.jpg/320px-Solarkabel.jpg" alt="DC Solar Cable" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128293;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Wiring</div><div class="comp-tile-name">DC Solar Cable</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Safety" data-id="6" onclick="selectComp(6)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Fuse_in_holder.jpg/320px-Fuse_in_holder.jpg" alt="DC Fuse" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#9889;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Safety</div><div class="comp-tile-name">DC Fuse &amp; Holder</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Safety" data-id="7" onclick="selectComp(7)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Circuit_breaker_ABB.jpg/320px-Circuit_breaker_ABB.jpg" alt="Circuit Breaker" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128308;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Safety</div><div class="comp-tile-name">AC Circuit Breaker</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Monitoring" data-id="8" onclick="selectComp(8)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Victron_SmartShunt.jpg/320px-Victron_SmartShunt.jpg" alt="Battery Monitor" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128202;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Monitoring</div><div class="comp-tile-name">Battery Monitor (Shunt)</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Structure" data-id="9" onclick="selectComp(9)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Solar_panel_installation.jpg/320px-Solar_panel_installation.jpg" alt="Mounting Rails" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#127959;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Structure</div><div class="comp-tile-name">Panel Mounting Rails</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Monitoring" data-id="10" onclick="selectComp(10)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/NTC_bead.jpg/320px-NTC_bead.jpg" alt="Temperature Sensor" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#127777;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Monitoring</div><div class="comp-tile-name">Temperature Sensor</div></div>
+  </div>
+
+  <div class="comp-tile" data-cat="Wiring" data-id="11" onclick="selectComp(11)">
+    <img class="comp-tile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Distribution_block.jpg/320px-Distribution_block.jpg" alt="Busbar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="comp-tile-img-placeholder" style="display:none">&#128269;</div>
+    <div class="comp-tile-body"><div class="comp-tile-cat">Wiring</div><div class="comp-tile-name">Busbar / Distribution Block</div></div>
+  </div>
+
+</div><!-- end comp-gallery -->
+
+<div style="display:flex;justify-content:flex-end">
+  <button class="next-btn primary" onclick="showPage('summary')">Next: system summary &#8594;</button>
+</div>
+</div>
+
 <!-- SUMMARY -->
 <div class="page" id="page-summary">
 <div class="mod-header"><div class="mod-eyebrow">Your Complete System</div><div class="mod-title">System summary</div><div class="mod-desc">Your off-grid solar system specification based on the values entered throughout the blueprint.</div></div>
@@ -1010,8 +1154,8 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 
 <script>
 const ST={wh:0,battAh:0,battVolt:24,panelW:0,panelCount:0,ctrlA:0,invW:0,fuseA:0,awg:''};
-const pages=['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','summary'];
-const bc={dashboard:'Dashboard',m1:'How Solar Works',m2:'Your Energy Needs',m3:'Battery Bank',m4:'Solar Panels',m5:'Charge Controllers',m6:'Inverters',m7:'Wiring & Safety',m8:'Installation',m9:'Monitoring',summary:'System Summary'};
+const pages=['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','components','summary'];
+const bc={dashboard:'Dashboard',m1:'How Solar Works',m2:'Your Energy Needs',m3:'Battery Bank',m4:'Solar Panels',m5:'Charge Controllers',m6:'Inverters',m7:'Wiring & Safety',m8:'Installation',m9:'Monitoring',components:'Component Guide',summary:'System Summary'};
 const mods=['m1','m2','m3','m4','m5','m6','m7','m8','m9'];
 
 
@@ -1286,6 +1430,54 @@ function updateSummary(){
 function exportSummary(){
   const txt='DIY Off-Grid Solar System Specification\n'+'-'.repeat(40)+'\nDaily Consumption: '+Math.round(ST.wh)+' Wh/day\nBattery Bank: '+ST.battAh+' Ah @ '+ST.battVolt+'V\nSolar Array: '+ST.panelW+'W ('+ST.panelCount+' panels)\nCharge Controller: '+ST.ctrlA+'A MPPT\nInverter: '+ST.invW+'W Pure Sine Wave\nMain DC Fuse: '+ST.fuseA+'A / '+ST.awg+' AWG cable\n'+'-'.repeat(40)+'\nGenerated by DIY Off-Grid Power Blueprint';
   navigator.clipboard.writeText(txt).then(()=>{const btn=document.querySelector('.export-btn');btn.textContent='v Copied!';setTimeout(()=>{btn.textContent=' Copy system spec to clipboard';},2500);});
+}
+
+
+// COMPONENTS
+const COMPS = [
+  {cat:'Generation',name:'Solar Panel',desc:'Converts sunlight into DC electricity using photovoltaic cells. Rated in watts (e.g. 400W). Sized to cover your daily energy needs plus system losses.',tip:'Look for monocrystalline panels for the best efficiency per square foot. They work better in low light and last 25-30 years.'},
+  {cat:'Control',name:'MPPT Charge Controller',desc:'Sits between panels and battery. Prevents overcharging and uses MPPT to extract up to 30% more power from panels than a basic PWM controller.',tip:'Always choose MPPT for systems over 200W. Size at (Panel Watts / Voltage) x 1.3.'},
+  {cat:'Storage',name:'LiFePO4 Battery',desc:'Lithium Iron Phosphate - best choice for off-grid. Lasts 2,000-5,000 cycles, 80% depth of discharge, zero maintenance, produces no gas.',tip:'Never use car starter batteries. LiFePO4 costs more upfront but lasts 5-10x longer than lead-acid.'},
+  {cat:'Conversion',name:'Pure Sine Wave Inverter',desc:'Converts DC battery power into standard AC electricity identical to grid power. Works with all appliances including motors, fridges, and sensitive electronics.',tip:'Always choose pure sine wave. Modified sine wave damages motors and electronics over time.'},
+  {cat:'Wiring',name:'MC4 Connectors',desc:'Weatherproof push-lock connectors for solar panel cables. Rated for UV exposure, rain, and temperature extremes. Male and female sides click-lock together.',tip:'Always confirm the audible click-lock before closing roof access. A loose MC4 creates heat and can cause a fire.'},
+  {cat:'Wiring',name:'DC Solar Cable',desc:'Flexible red (positive) and black (negative) cables rated for DC solar use. Must be sized in AWG based on current carried to prevent voltage drop and overheating.',tip:'Use red for positive (+) and black for negative (-) throughout your entire system without exception.'},
+  {cat:'Safety',name:'DC Fuse & Holder',desc:'Protects cables in case of short circuit. Required at 3 locations: panels-to-controller, controller-to-battery, and battery-to-inverter. Must be close to the battery.',tip:'Install the battery-to-inverter fuse within 18 inches of the battery terminal - it carries the most current.'},
+  {cat:'Safety',name:'AC Circuit Breaker',desc:'Protects AC wiring between inverter output and household loads. Also serves as a manual disconnect switch. Sized at 1.25x the inverter max AC output current.',tip:'Keep the AC breaker OFF during initial wiring. Only close it after all DC connections are made and verified.'},
+  {cat:'Monitoring',name:'Battery Monitor (Shunt)',desc:'A precision shunt that measures every amp in and out of the battery. Calculates true state of charge with much higher accuracy than the charge controller estimate.',tip:'The Victron SmartShunt connects to your phone via Bluetooth for real-time monitoring anywhere.'},
+  {cat:'Structure',name:'Panel Mounting Rails',desc:'Aluminum rails and clamps that secure solar panels to a roof, ground frame, or wall. Must be angled correctly toward the sun for maximum year-round production.',tip:'Optimal tilt angle equals your latitude. Northern hemisphere: face south. Southern hemisphere: face north.'},
+  {cat:'Monitoring',name:'Temperature Sensor',desc:'A probe that attaches to the battery casing and plugs into the charge controller. The controller uses this to automatically compensate charge voltage for temperature.',tip:'Critical for LiFePO4 in cold climates. Lithium batteries must never be charged below 0 degrees C.'},
+  {cat:'Wiring',name:'Busbar / Distribution Block',desc:'A copper bar with multiple terminals. Used to combine battery cables, ground negative connections to one point, or split one cable into multiple smaller ones cleanly.',tip:'Use a busbar instead of stacking cables on a battery terminal. It reduces heat buildup and makes wiring cleaner and easier to service.'}
+];
+
+function selectComp(idx){
+  document.querySelectorAll('.comp-tile').forEach(t=>t.classList.remove('active'));
+  const tile=document.querySelector('.comp-tile[data-id="'+idx+'"]');
+  if(tile)tile.classList.add('active');
+  const d=COMPS[idx];
+  const tileImg=tile?tile.querySelector('.comp-tile-img'):null;
+  const img=document.getElementById('cdp-img');
+  const ph=document.getElementById('cdp-placeholder');
+  if(tileImg&&tileImg.naturalWidth>0){
+    img.src=tileImg.src;img.alt=d.name;img.style.display='block';ph.style.display='none';
+  } else if(tileImg){
+    img.src=tileImg.src;img.alt=d.name;img.style.display='block';ph.style.display='none';
+  }
+  document.getElementById('cdp-cat').textContent=d.cat;
+  document.getElementById('cdp-name').textContent=d.name;
+  document.getElementById('cdp-desc').textContent=d.desc;
+  document.getElementById('cdp-tip').textContent=d.tip;
+  document.getElementById('comp-detail-panel').classList.add('show');
+  document.getElementById('comp-detail-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function filterCat(cat,btn){
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.comp-tile').forEach(tile=>{
+    tile.style.display=(cat==='all'||tile.dataset.cat===cat)?'':'none';
+  });
+  document.getElementById('comp-detail-panel').classList.remove('show');
+  document.querySelectorAll('.comp-tile').forEach(t=>t.classList.remove('active'));
 }
 
 // Init
