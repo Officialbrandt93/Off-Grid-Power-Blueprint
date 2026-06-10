@@ -34,6 +34,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 .topbar-breadcrumb strong{color:var(--text)}
 .status-chip{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--slate);background:var(--cream);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
 .status-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.mobile-topbar{display:none}
 .page{display:none;padding:28px 32px;max-width:840px}
 .page.active{display:block}
 .mod-header{margin-bottom:24px}
@@ -321,7 +322,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
   .status-chip { font-size: 10px; padding: 3px 8px; }
 
   /* Hamburger button */
-  .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; flex-shrink: 0; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; flex-shrink: 0; }
   .hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; }
 
   /* Pages */
@@ -405,10 +406,16 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 
   /* Progress section in sidebar */
   .progress-section { padding: 12px 16px; }
-}
 
-/* Hide hamburger on desktop */
-.hamburger { display: none; }
+  /* Mobile top bar */
+  .mobile-topbar { display: flex; align-items: center; gap: 12px; background: var(--green); padding: 12px 16px; position: sticky; top: 0; z-index: 50; }
+  .mobile-topbar-title { flex: 1; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: var(--amber); letter-spacing: 0.05em; }
+  .hamburger { display: flex; }
+  .hamburger span { background: var(--white); }
+  /* Hide desktop topbar on mobile */
+  .topbar { display: none; }
+
+}
 </style>
 </head>
 <body>
@@ -435,13 +442,21 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 
 <main class="main" id="mainArea">
 <div class="topbar">
-  <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
   <div class="topbar-breadcrumb">Blueprint &#8250; <strong id="breadcrumb">Dashboard</strong></div>
   <div class="status-chip"><span class="dot"></span><span id="statusText">In Progress</span></div>
 </div>
 <div class="mobile-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+<!-- Mobile top bar -->
+<div class="mobile-topbar" id="mobile-topbar">
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mobile-topbar-title">&#9889; Off-Grid Blueprint</div>
+  <div class="status-chip" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.2);color:white">
+    <span class="dot" style="background:var(--amber)"></span>
+    <span>In Progress</span>
+  </div>
+</div>
 
 <!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
