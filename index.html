@@ -446,6 +446,34 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
   .comp-detail-img, .comp-detail-img-placeholder { width: 100%; min-width: unset; height: 180px; }
   .comp-tile-img, .comp-tile-img-placeholder { height: 100px; }
 }
+
+/* SAFETY PAGE */
+.safety-section { margin-bottom: 1.5rem; }
+.safety-level { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.level-critical { background: var(--bg-danger); color: var(--text-danger); }
+.level-warning { background: var(--bg-warning); color: var(--text-warning); }
+.level-info { background: var(--bg-info); color: var(--text-info); }
+.safety-rule { display: flex; align-items: flex-start; gap: 12px; background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.safety-rule.critical { border-left: 3px solid var(--text-danger); background: var(--bg-danger); }
+.safety-rule.warning { border-left: 3px solid var(--text-warning); background: var(--bg-warning); }
+.safety-rule .sr-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.safety-rule .sr-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+.safety-rule .sr-text strong { font-weight: 600; }
+.epi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin: 14px 0; }
+.epi-card { background: var(--white); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+.epi-card svg { display: block; margin: 0 auto 8px; }
+.epi-card .epi-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.epi-card .epi-desc { font-size: 11px; color: var(--slate); line-height: 1.4; }
+.emergency-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin: 12px 0; }
+.emergency-card { background: var(--bg-danger); border: 0.5px solid var(--border-danger); border-radius: 10px; padding: 14px; }
+.emergency-card .ec-title { font-size: 13px; font-weight: 600; color: var(--text-danger); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.emergency-card ol { margin: 0; padding-left: 18px; }
+.emergency-card ol li { font-size: 12px; color: var(--text-danger); line-height: 1.6; }
+.vent-diagram { background: var(--cream); border-radius: 10px; padding: 16px; margin: 12px 0; }
+@media (max-width: 768px) {
+  .epi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .emergency-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -466,6 +494,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
     <div class="nav-item" id="nav-m8" onclick="showPage('m8')"><span class="nav-icon">&#127959;</span><span class="nav-text">Installation</span><span class="nav-badge">LIST</span></div>
     <div class="nav-item" id="nav-m9" onclick="showPage('m9')"><span class="nav-icon">&#128202;</span><span class="nav-text">Monitoring</span></div>
     <div class="nav-group-label">Output</div>
+    <div class="nav-item" id="nav-safety" onclick="showPage('safety')"><span class="nav-icon">&#9888;</span><span class="nav-text">Safety Guide</span></div>
     <div class="nav-item" id="nav-components" onclick="showPage('components')"><span class="nav-icon">&#128269;</span><span class="nav-text">Component Guide</span></div>
     <div class="nav-item" id="nav-summary" onclick="showPage('summary')"><span class="nav-icon">&#128203;</span><span class="nav-text">System Summary</span></div>
   </div>
@@ -1023,6 +1052,211 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 </div>
 
 
+
+<!-- SAFETY PAGE -->
+<div class="page" id="page-safety">
+<div class="mod-header">
+  <div class="mod-eyebrow">Critical Reading</div>
+  <div class="mod-title">Safety Guide</div>
+  <div class="mod-desc">Off-grid solar systems carry real electrical hazards. Read this page before touching any component. Most accidents are caused by skipping steps that take less than 60 seconds.</div>
+</div>
+
+<!-- CRITICAL RULES -->
+<div class="card safety-section">
+  <h3>&#9888; The rules that must never be broken</h3>
+  <div class="safety-rule critical">
+    <span class="sr-icon">&#128308;</span>
+    <div class="sr-text"><strong>Battery last, battery first.</strong> Always connect the battery bank last when wiring up, and disconnect it first when doing maintenance. Every other component becomes live the moment the battery is connected.</div>
+  </div>
+  <div class="safety-rule critical">
+    <span class="sr-icon">&#128308;</span>
+    <div class="sr-text"><strong>Red = positive, black = negative. Always.</strong> Reversing polarity on a DC system instantly destroys charge controllers and inverters. There is no recovery — the component is dead. Use color-coded cables throughout with no exceptions.</div>
+  </div>
+  <div class="safety-rule critical">
+    <span class="sr-icon">&#128308;</span>
+    <div class="sr-text"><strong>Never work on live DC circuits.</strong> Unlike AC, DC arcs do not self-extinguish when a connection is broken. A DC short circuit sustains an arc flash that can cause severe burns and fires. Always disconnect and verify dead before working.</div>
+  </div>
+  <div class="safety-rule critical">
+    <span class="sr-icon">&#128308;</span>
+    <div class="sr-text"><strong>Fuse every circuit before energizing.</strong> A cable without a fuse is a potential fire starter. Never power up any part of the system without the required fuses installed at all 3 mandatory locations.</div>
+  </div>
+  <div class="safety-rule warning">
+    <span class="sr-icon">&#9888;&#65039;</span>
+    <div class="sr-text"><strong>Cover panels before disconnecting.</strong> A solar panel in sunlight is always live — even with the controller disconnected. Cover panels with a dark cloth or thick cardboard before working on panel cables.</div>
+  </div>
+  <div class="safety-rule warning">
+    <span class="sr-icon">&#9888;&#65039;</span>
+    <div class="sr-text"><strong>Never charge lithium below 0&#176;C.</strong> Charging a LiFePO4 battery below freezing causes permanent internal damage called lithium plating. Use a temperature sensor connected to the charge controller to prevent this automatically.</div>
+  </div>
+</div>
+
+<!-- PPE -->
+<div class="card safety-section">
+  <h3>Personal protective equipment (PPE)</h3>
+  <p style="margin-bottom:12px">Wear the correct PPE whenever working on or near live circuits. These items cost very little compared to the injuries they prevent.</p>
+  <div class="epi-grid">
+
+    <!-- Insulated gloves SVG -->
+    <div class="epi-card">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="4" y="28" width="56" height="28" rx="8" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <rect x="10" y="16" width="12" height="18" rx="4" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <rect x="24" y="12" width="10" height="18" rx="4" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <rect x="36" y="14" width="10" height="16" rx="4" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <rect x="48" y="18" width="9" height="13" rx="4" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <text x="32" y="48" text-anchor="middle" font-size="8" fill="#744210" font-weight="600">1000V</text>
+      </svg>
+      <div class="epi-name">Insulated gloves</div>
+      <div class="epi-desc">Rated 1000V minimum. Wear whenever handling live terminals.</div>
+    </div>
+
+    <!-- Safety glasses SVG -->
+    <div class="epi-card">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="24" width="20" height="16" rx="6" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="1.5"/>
+        <rect x="36" y="24" width="20" height="16" rx="6" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="1.5"/>
+        <line x1="28" y1="32" x2="36" y2="32" stroke="#2B6CB0" stroke-width="1.5"/>
+        <line x1="4" y1="30" x2="8" y2="30" stroke="#2B6CB0" stroke-width="1.5"/>
+        <line x1="56" y1="30" x2="60" y2="30" stroke="#2B6CB0" stroke-width="1.5"/>
+        <circle cx="18" cy="32" r="4" fill="#BEE3F8" stroke="#2B6CB0" stroke-width="0.5"/>
+        <circle cx="46" cy="32" r="4" fill="#BEE3F8" stroke="#2B6CB0" stroke-width="0.5"/>
+      </svg>
+      <div class="epi-name">Safety glasses</div>
+      <div class="epi-desc">Protects from arc flash sparks and battery acid splatter.</div>
+    </div>
+
+    <!-- Insulated tools SVG -->
+    <div class="epi-card">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="28" y="8" width="8" height="32" rx="2" fill="#FFF8E8" stroke="#E8A020" stroke-width="1.5"/>
+        <rect x="26" y="36" width="12" height="18" rx="4" fill="#F0FFF4" stroke="#276749" stroke-width="1.5"/>
+        <line x1="30" y1="8" x2="24" y2="14" stroke="#E8A020" stroke-width="1.5"/>
+        <line x1="34" y1="8" x2="40" y2="14" stroke="#E8A020" stroke-width="1.5"/>
+        <text x="32" y="50" text-anchor="middle" font-size="7" fill="#276749" font-weight="600">1000V</text>
+      </svg>
+      <div class="epi-name">Insulated tools</div>
+      <div class="epi-desc">Screwdrivers and pliers rated 1000V. Never use uninsulated tools near live terminals.</div>
+    </div>
+
+    <!-- Multimeter SVG -->
+    <div class="epi-card">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="14" y="10" width="36" height="44" rx="6" fill="#F7F3EC" stroke="#4A5568" stroke-width="1.5"/>
+        <rect x="20" y="16" width="24" height="14" rx="3" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="1"/>
+        <circle cx="32" cy="40" r="6" fill="white" stroke="#4A5568" stroke-width="1"/>
+        <line x1="32" y1="40" x2="36" y2="36" stroke="#E53E3E" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="32" cy="40" r="1.5" fill="#4A5568"/>
+        <text x="32" y="27" text-anchor="middle" font-size="7" fill="#2B6CB0" font-weight="600">DCV</text>
+      </svg>
+      <div class="epi-name">Multimeter</div>
+      <div class="epi-desc">Verify dead before touching. Always measure voltage before every connection.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- BATTERY STORAGE & VENTILATION -->
+<div class="card safety-section">
+  <h3>Battery storage and ventilation</h3>
+  <p style="margin-bottom:12px">Where and how you store your batteries affects both safety and battery lifespan.</p>
+  <div class="vent-diagram">
+    <svg width="100%" viewBox="0 0 680 260" role="img">
+      <title>Battery storage diagram showing ventilation requirements for FLA vs LiFePO4</title>
+      <defs><marker id="sarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+      <!-- FLA Box -->
+      <rect x="40" y="40" width="240" height="180" rx="10" fill="#FFF5F5" stroke="#FEB2B2" stroke-width="1"/>
+      <text x="160" y="64" text-anchor="middle" class="th" style="fill:#742A2A">Flooded lead-acid (FLA)</text>
+      <!-- Ventilation arrows up -->
+      <line x1="100" y1="140" x2="100" y2="55" stroke="#E53E3E" stroke-width="1.5" marker-end="url(#sarr)" stroke-dasharray="4 3"/>
+      <line x1="130" y1="140" x2="130" y2="55" stroke="#E53E3E" stroke-width="1.5" marker-end="url(#sarr)" stroke-dasharray="4 3"/>
+      <line x1="160" y1="140" x2="160" y2="55" stroke="#E53E3E" stroke-width="1.5" marker-end="url(#sarr)" stroke-dasharray="4 3"/>
+      <line x1="190" y1="140" x2="190" y2="55" stroke="#E53E3E" stroke-width="1.5" marker-end="url(#sarr)" stroke-dasharray="4 3"/>
+      <line x1="220" y1="140" x2="220" y2="55" stroke="#E53E3E" stroke-width="1.5" marker-end="url(#sarr)" stroke-dasharray="4 3"/>
+      <!-- Battery shape -->
+      <rect x="80" y="150" width="160" height="50" rx="6" fill="#FEB2B2" stroke="#E53E3E" stroke-width="1"/>
+      <text x="160" y="180" text-anchor="middle" class="ts" style="fill:#742A2A">Battery</text>
+      <!-- H2 label -->
+      <text x="160" y="120" text-anchor="middle" class="ts" style="fill:#742A2A">H&#8322; gas released</text>
+      <!-- Rule -->
+      <text x="160" y="225" text-anchor="middle" class="ts" style="fill:#742A2A">Requires ventilation to outdoors</text>
+      <text x="160" y="240" text-anchor="middle" class="ts" style="fill:#A53030">Never store in living areas</text>
+
+      <!-- LiFePO4 Box -->
+      <rect x="320" y="40" width="320" height="180" rx="10" fill="#F0FFF4" stroke="#9AE6B4" stroke-width="1"/>
+      <text x="480" y="64" text-anchor="middle" class="th" style="fill:#276749">LiFePO4 (lithium)</text>
+      <!-- No gas symbol -->
+      <circle cx="480" cy="130" r="36" fill="white" stroke="#9AE6B4" stroke-width="1"/>
+      <text x="480" y="118" text-anchor="middle" class="ts" style="fill:#276749">No gas</text>
+      <text x="480" y="135" text-anchor="middle" class="ts" style="fill:#276749">produced</text>
+      <text x="480" y="152" text-anchor="middle" class="ts" style="fill:#276749">&#10003; Safe indoors</text>
+      <!-- Rules -->
+      <text x="480" y="205" text-anchor="middle" class="ts" style="fill:#276749">No ventilation required</text>
+      <text x="480" y="220" text-anchor="middle" class="ts" style="fill:#276749">Avoid direct sunlight + extreme heat</text>
+      <text x="480" y="235" text-anchor="middle" class="ts" style="fill:#276749">Keep dry — no moisture exposure</text>
+    </svg>
+  </div>
+  <div class="safety-rule warning">
+    <span class="sr-icon">&#9888;&#65039;</span>
+    <div class="sr-text"><strong>FLA batteries release hydrogen gas during charging.</strong> Hydrogen is explosive at concentrations above 4%. Never store flooded lead-acid batteries in enclosed spaces, near open flames, or in living areas. Install a vent directly to the outside.</div>
+  </div>
+</div>
+
+<!-- EMERGENCY PROCEDURES -->
+<div class="card safety-section">
+  <h3>Emergency procedures</h3>
+  <div class="emergency-grid">
+    <div class="emergency-card">
+      <div class="ec-title">&#128293; Electrical fire</div>
+      <ol>
+        <li>Do NOT use water — it conducts electricity</li>
+        <li>Use a Class C or CO&#8322; extinguisher only</li>
+        <li>Disconnect the battery if safe to do so</li>
+        <li>Evacuate and call emergency services</li>
+        <li>Do not re-enter until cleared by professionals</li>
+      </ol>
+    </div>
+    <div class="emergency-card">
+      <div class="ec-title">&#9889; Electric shock</div>
+      <ol>
+        <li>Do NOT touch the person directly</li>
+        <li>Disconnect power at the source first</li>
+        <li>Use a non-conductive object to separate if needed</li>
+        <li>Call emergency services immediately</li>
+        <li>Begin CPR if trained and if person is unresponsive</li>
+      </ol>
+    </div>
+    <div class="emergency-card">
+      <div class="ec-title">&#128165; Short circuit / arc</div>
+      <ol>
+        <li>Disconnect battery immediately if safe</li>
+        <li>Do not touch the arcing point — extreme heat</li>
+        <li>If fire starts, treat as electrical fire</li>
+        <li>Inspect all cables before re-energizing</li>
+        <li>Replace any melted or damaged cables before restart</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL NOTE -->
+<div class="card safety-section">
+  <h3>Legal and code requirements</h3>
+  <div class="safety-rule warning">
+    <span class="sr-icon">&#128196;</span>
+    <div class="sr-text"><strong>Check local regulations before installing.</strong> In many countries and states, connecting any solar system to a household distribution panel requires a licensed electrician. A fully standalone off-grid system (not connected to the grid or main panel) is generally DIY-legal in most jurisdictions, but local codes vary. Always verify before starting work.</div>
+  </div>
+  <div class="safety-rule warning">
+    <span class="sr-icon">&#128196;</span>
+    <div class="sr-text"><strong>The NEC formulas in this guide are a starting point, not a substitute for professional review.</strong> For large systems (over 5kW), systems in commercial properties, or any system connected to a distribution panel, consult a licensed solar installer or electrician.</div>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:flex-end">
+  <button class="next-btn primary" onclick="showPage('safety')">Next: safety guide &#8594;</button>
+</div>
+</div>
+
 <!-- COMPONENTS PAGE -->
 <div class="page" id="page-components">
 <div class="mod-header">
@@ -1154,8 +1388,8 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);di
 
 <script>
 const ST={wh:0,battAh:0,battVolt:24,panelW:0,panelCount:0,ctrlA:0,invW:0,fuseA:0,awg:''};
-const pages=['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','components','summary'];
-const bc={dashboard:'Dashboard',m1:'How Solar Works',m2:'Your Energy Needs',m3:'Battery Bank',m4:'Solar Panels',m5:'Charge Controllers',m6:'Inverters',m7:'Wiring & Safety',m8:'Installation',m9:'Monitoring',components:'Component Guide',summary:'System Summary'};
+const pages=['dashboard','m1','m2','m3','m4','m5','m6','m7','m8','m9','safety','components','summary'];
+const bc={dashboard:'Dashboard',m1:'How Solar Works',m2:'Your Energy Needs',m3:'Battery Bank',m4:'Solar Panels',m5:'Charge Controllers',m6:'Inverters',m7:'Wiring & Safety',m8:'Installation',m9:'Monitoring',safety:'Safety Guide',components:'Component Guide',summary:'System Summary'};
 const mods=['m1','m2','m3','m4','m5','m6','m7','m8','m9'];
 
 
