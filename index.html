@@ -896,10 +896,10 @@ function showPage(id){
 
 // M1
 const compData={
-  panel:'The solar panel is the starting point. Photovoltaic cells absorb photons and release electrons — the photovoltaic effect. The result is DC electricity. Panels are rated in watts and sized to meet your daily energy needs.',
-  ctrl:'The charge controller prevents overcharging and over-discharging. It also acts as a one-way gate, preventing the battery from discharging back through the panels at night. MPPT controllers extract 10–30% more power than PWM.',
+  panel:'The solar panel is the starting point. Photovoltaic cells absorb photons and release electrons -- the photovoltaic effect. The result is DC electricity. Panels are rated in watts and sized to meet your daily energy needs.',
+  ctrl:'The charge controller prevents overcharging and over-discharging. It also acts as a one-way gate, preventing the battery from discharging back through the panels at night. MPPT controllers extract 10-30% more power than PWM.',
   batt:'The battery bank is the heart of the system and the most expensive component. It stores energy produced during the day and releases it at night. Sizing correctly means choosing the right capacity (Ah), voltage, and depth of discharge.',
-  inv:'The inverter converts DC power stored in the battery into AC power — the same type that comes out of a wall socket. Always choose a pure sine wave inverter, which works with all appliances including sensitive electronics and motor-driven devices.'
+  inv:'The inverter converts DC power stored in the battery into AC power -- the same type that comes out of a wall socket. Always choose a pure sine wave inverter, which works with all appliances including sensitive electronics and motor-driven devices.'
 };
 const stepData=[
   {title:'Sunlight hits the panels',body:'Solar panels convert sunlight directly into electricity. The amount of energy depends on panel wattage, sun intensity, and how many peak sun hours your location receives each day.',tags:[['DC output','dc'],['No moving parts','key'],['Scales with sun hours','key']]},
@@ -907,7 +907,7 @@ const stepData=[
   {title:'Charge controller regulates the flow',body:'The controller monitors battery voltage and adjusts how much current flows in from the panels. An MPPT controller also optimises the panel voltage to extract maximum power.',tags:[['DC regulated','dc'],['MPPT = more efficient','key'],['Protects the battery','key']]},
   {title:'Battery stores the energy',body:'Energy is stored as chemical potential in the battery cells. The charge controller stops the flow at the correct voltage for the battery chemistry selected.',tags:[['DC stored','dc'],['LiFePO4 recommended','key'],['DOD matters','key']]},
   {title:'Inverter converts DC to AC',body:'When you need to power an AC appliance, DC power flows from the battery into the inverter. The inverter reconstructs a smooth AC sine wave identical to grid power.',tags:[['DC in to AC out','ac'],['Pure sine wave required','key'],['Match system voltage','key']]},
-  {title:'Your home is powered',body:'AC power from the inverter reaches your outlets and appliances through standard household wiring. The system runs silently and invisibly — your appliances have no idea they are not on the grid.',tags:[['AC load','ac'],['120V or 230V','key'],['Silent operation','key']]}
+  {title:'Your home is powered',body:'AC power from the inverter reaches your outlets and appliances through standard household wiring. The system runs silently and invisibly -- your appliances have no idea they are not on the grid.',tags:[['AC load','ac'],['120V or 230V','key'],['Silent operation','key']]}
 ];
 function selComp(id){
   document.querySelectorAll('.comp-card').forEach(c=>c.classList.remove('active'));
@@ -934,12 +934,12 @@ function calcE(){
     const cell=row.querySelector('.wh-out');if(cell)cell.textContent=Math.round(wh).toLocaleString('en');
   });
   document.getElementById('totalWh').textContent=Math.round(total).toLocaleString('en');
-  document.getElementById('buf-val').textContent='+20% buffer → '+Math.round(total*1.2).toLocaleString('en')+' Wh/day';
+  document.getElementById('buf-val').textContent='+20% buffer -> '+Math.round(total*1.2).toLocaleString('en')+' Wh/day';
   ST.wh=total;
   const bwh=document.getElementById('b-wh');if(bwh)bwh.value=Math.round(total);
   const pwh=document.getElementById('p-wh');if(pwh)pwh.value=Math.round(total);
   calcBatt();calcPanels();
-  updateDash('wh',Math.round(total).toLocaleString('en')+' Wh','Module 2 complete ✓');
+  updateDash('wh',Math.round(total).toLocaleString('en')+' Wh','Module 2 complete v');
 }
 function addERow(){
   const tbody=document.getElementById('app-body'),row=document.createElement('tr');
@@ -950,9 +950,9 @@ function delRow(btn){btn.closest('tr').remove();calcE();}
 
 // M3
 const battData={
-  lifepo4:{detail:'The best choice for most residential systems. LiFePO4 lasts 2,000–5,000 cycles, can be discharged to 80% safely, requires zero maintenance, and needs no ventilation. The higher upfront cost is offset by a lifespan of 10+ years.',cycles:'2,000–5,000',dod:'80%',maint:'None'},
-  agm:{detail:'Sealed, spill-proof, and maintenance-free. A solid middle-ground option. Limit discharge to 50% DOD to protect lifespan. Good for vacation homes or situations where regular maintenance is not possible.',cycles:'400–600',dod:'50%',maint:'None'},
-  fla:{detail:'The cheapest option, but requires monthly maintenance: checking electrolyte water levels every 1–3 months. Must be installed in a ventilated space. Best for full-time off-gridders comfortable with hands-on upkeep.',cycles:'300–500',dod:'50%',maint:'Monthly'}
+  lifepo4:{detail:'The best choice for most residential systems. LiFePO4 lasts 2,000-5,000 cycles, can be discharged to 80% safely, requires zero maintenance, and needs no ventilation. The higher upfront cost is offset by a lifespan of 10+ years.',cycles:'2,000-5,000',dod:'80%',maint:'None'},
+  agm:{detail:'Sealed, spill-proof, and maintenance-free. A solid middle-ground option. Limit discharge to 50% DOD to protect lifespan. Good for vacation homes or situations where regular maintenance is not possible.',cycles:'400-600',dod:'50%',maint:'None'},
+  fla:{detail:'The cheapest option, but requires monthly maintenance: checking electrolyte water levels every 1-3 months. Must be installed in a ventilated space. Best for full-time off-gridders comfortable with hands-on upkeep.',cycles:'300-500',dod:'50%',maint:'Monthly'}
 };
 function selBatt(id){
   ['lifepo4','agm','fla'].forEach(b=>document.getElementById('bc-'+b).classList.remove('active'));
@@ -977,14 +977,14 @@ function calcBatt(){
   const result=Math.ceil((wh*days)/(volt*dod));
   const el=document.getElementById('b-result');if(el)el.textContent=result.toLocaleString('en');
   ST.battAh=result;ST.battVolt=volt;
-  updateDash('batt',result+' Ah','Module 3 complete ✓');
+  updateDash('batt',result+' Ah','Module 3 complete v');
 }
 
 // M4
 const panelData={
-  mono:{detail:'Made from a single silicon crystal, monocrystalline panels are the most efficient type. They perform better in low-light conditions, have the longest lifespan (25–30 years), and take up the least roof space per watt. Recommended for most residential off-grid installations.',eff:'17–22%',life:'25–30 yrs',best:'Limited space'},
-  poly:{detail:'Made from multiple silicon crystals melted together, polycrystalline panels are slightly less efficient but cost less per panel. A good budget option for homes with ample unshaded roof area.',eff:'15–17%',life:'20–25 yrs',best:'Ample roof space'},
-  thin:{detail:'Thin-film panels deposit photovoltaic material on a substrate. They are the cheapest per watt but least efficient, requiring significantly more space. Mostly used in large utility-scale installations — not recommended for residential off-grid.',eff:'10–13%',life:'10–20 yrs',best:'Large-scale only'}
+  mono:{detail:'Made from a single silicon crystal, monocrystalline panels are the most efficient type. They perform better in low-light conditions, have the longest lifespan (25-30 years), and take up the least roof space per watt. Recommended for most residential off-grid installations.',eff:'17-22%',life:'25-30 yrs',best:'Limited space'},
+  poly:{detail:'Made from multiple silicon crystals melted together, polycrystalline panels are slightly less efficient but cost less per panel. A good budget option for homes with ample unshaded roof area.',eff:'15-17%',life:'20-25 yrs',best:'Ample roof space'},
+  thin:{detail:'Thin-film panels deposit photovoltaic material on a substrate. They are the cheapest per watt but least efficient, requiring significantly more space. Mostly used in large utility-scale installations -- not recommended for residential off-grid.',eff:'10-13%',life:'10-20 yrs',best:'Large-scale only'}
 };
 function selPanel(id){
   ['mono','poly','thin'].forEach(p=>document.getElementById('pc-'+p).classList.remove('active'));
@@ -1007,7 +1007,7 @@ function calcPanels(){
   ST.panelW=actual;ST.panelCount=count;
   const cw=document.getElementById('c-watts');if(cw)cw.value=actual;
   calcCtrl();
-  updateDash('panel',actual+'W ('+count+' panels)','Module 4 complete ✓');
+  updateDash('panel',actual+'W ('+count+' panels)','Module 4 complete v');
 }
 
 // M5
@@ -1022,7 +1022,7 @@ function calcCtrl(){
   const ct=document.getElementById('c-type');if(ct)ct.textContent=watts>=200?'MPPT recommended':'PWM or MPPT';
   ST.ctrlA=selected;
   const wi=document.getElementById('w-input');if(wi&&document.getElementById('w-type')?.value==='dc-batt')wi.value=selected*volt;
-  updateDash('ctrl',selected+'A MPPT','Module 5 complete ✓');
+  updateDash('ctrl',selected+'A MPPT','Module 5 complete v');
 }
 
 // M6
@@ -1044,7 +1044,7 @@ function calcInv(){
   ST.invW=selected;
   const wi=document.getElementById('w-input');if(wi)wi.value=selected;
   calcWiring();
-  updateDash('inv',selected+'W Pure Sine','Module 6 complete ✓');
+  updateDash('inv',selected+'W Pure Sine','Module 6 complete v');
 }
 function getHighInvW(){
   const rows=document.querySelectorAll('#inv-body tr');let max=0;
@@ -1064,7 +1064,7 @@ function addInvRow(){
 function delInvRow(btn){btn.closest('tr').remove();calcInv();}
 
 // M7
-const wFormulas={'dc-batt':'DC fuse (A) = (Inverter W ÷ Battery V) × 1.56','dc-pv':'DC fuse (A) = Panel Isc × 1.56','ac-out':'AC breaker (A) = Inverter max AC output current × 1.25'};
+const wFormulas={'dc-batt':'DC fuse (A) = (Inverter W / Battery V) x 1.56','dc-pv':'DC fuse (A) = Panel Isc x 1.56','ac-out':'AC breaker (A) = Inverter max AC output current x 1.25'};
 const wLabels={'dc-batt':'Inverter wattage (W)','dc-pv':'Panel short-circuit current Isc (A)','ac-out':'Inverter AC output current (A)'};
 function updateWType(){
   const type=document.getElementById('w-type').value;
@@ -1091,13 +1091,13 @@ function calcWiring(){
   const wf=document.getElementById('w-fuse');if(wf)wf.textContent=selectedFuse;
   const waw=document.getElementById('w-awg');if(waw)waw.textContent=awg;
   ST.fuseA=selectedFuse;ST.awg=awg;
-  updateDash('cable',awg+' AWG / '+selectedFuse+'A','Module 7 complete ✓');
+  updateDash('cable',awg+' AWG / '+selectedFuse+'A','Module 7 complete v');
 }
 
 // Checklists
 function toggleCheck(el,pfx){
   el.classList.toggle('checked');
-  el.querySelector('.cb').textContent=el.classList.contains('checked')?'✓':'';
+  el.querySelector('.cb').textContent=el.classList.contains('checked')?'v':'';
   updateCheckProgress(pfx);
 }
 function updateCheckProgress(pfx){
@@ -1112,7 +1112,7 @@ function updateCheckProgress(pfx){
 
 // M9
 const monitorData={
-  soc:'State of charge is the most important daily metric. If it rarely reaches 80–100% on sunny days, your panels may be undersized. If it frequently drops below your DOD limit, your battery or usage pattern needs adjustment.',
+  soc:'State of charge is the most important daily metric. If it rarely reaches 80-100% on sunny days, your panels may be undersized. If it frequently drops below your DOD limit, your battery or usage pattern needs adjustment.',
   temp:'Battery temperature affects how efficiently it charges and discharges. A temperature sensor connected to the charge controller automatically adjusts the charge setpoint to compensate for temperature changes.',
   prod:'Daily solar production tells you whether your panels are performing as expected. A consistent 20%+ shortfall means panels need cleaning, shading is an issue, or a panel may have failed.',
   cons:'Tracking daily consumption lets you compare actual usage against what you calculated in Module 2. If consumption is consistently higher, your battery and panels may be undersized for your real needs.'
@@ -1141,16 +1141,16 @@ function updateSummary(){
 }
 function exportSummary(){
   const txt='DIY Off-Grid Solar System Specification
-'+'─'.repeat(40)+'
+'+'-'.repeat(40)+'
 Daily Consumption: '+Math.round(ST.wh)+' Wh/day
 Battery Bank: '+ST.battAh+' Ah @ '+ST.battVolt+'V
 Solar Array: '+ST.panelW+'W ('+ST.panelCount+' panels)
 Charge Controller: '+ST.ctrlA+'A MPPT
 Inverter: '+ST.invW+'W Pure Sine Wave
 Main DC Fuse: '+ST.fuseA+'A / '+ST.awg+' AWG cable
-'+'─'.repeat(40)+'
+'+'-'.repeat(40)+'
 Generated by DIY Off-Grid Power Blueprint';
-  navigator.clipboard.writeText(txt).then(()=>{const btn=document.querySelector('.export-btn');btn.textContent='✓ Copied!';setTimeout(()=>{btn.textContent='📋 Copy system spec to clipboard';},2500);});
+  navigator.clipboard.writeText(txt).then(()=>{const btn=document.querySelector('.export-btn');btn.textContent='v Copied!';setTimeout(()=>{btn.textContent=' Copy system spec to clipboard';},2500);});
 }
 
 // Init
