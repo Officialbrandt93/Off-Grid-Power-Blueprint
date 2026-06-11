@@ -223,67 +223,112 @@ body{
 </div>
 
 <script>
-function clearMsg(){document.getElementById('msg').className='msg';}
+const SUPABASE_URL = 'https://cgckdzprhgaprdxibmqn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnY2tkenByaGdhcHJkeGlibXFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExOTg5MjUsImV4cCI6MjA5Njc3NDkyNX0.FKyfeLP_qcZjxnxLSi79kREIkxtf7KOVLW-35MiRZOI';
+const PRODUCT_CODE = 'off-grid-power-blueprint';
+const APP_URL = '/app'; // change to full URL if login and app are on different domains
 
-function showMsg(type,text){
-  const m=document.getElementById('msg');
-  m.className='msg show '+type;
-  document.getElementById('msg-txt').textContent=text;
+function clearMsg(){
+  document.getElementById('msg').className='msg';
+}
+
+function showMsg(type, text){
+  const m = document.getElementById('msg');
+  m.className = 'msg show ' + type;
+  document.getElementById('msg-txt').textContent = text;
+}
+
+function setSpinner(){
+  const ico = document.getElementById('msg-ico');
+  if(!ico) return;
+  const spin = document.createElement('div');
+  spin.id = 'msg-spinner';
+  spin.className = 'spin';
+  ico.replaceWith(spin);
+}
+
+function restoreIcon(){
+  const spin = document.getElementById('msg-spinner');
+  if(!spin) return;
+  const ico = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  ico.id = 'msg-ico';
+  ico.setAttribute('width','16'); ico.setAttribute('height','16');
+  ico.setAttribute('viewBox','0 0 24 24'); ico.setAttribute('fill','none');
+  ico.setAttribute('stroke','currentColor'); ico.setAttribute('stroke-width','2');
+  ico.setAttribute('stroke-linecap','round'); ico.setAttribute('stroke-linejoin','round');
+  ico.style.flexShrink = '0';
+  ico.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  spin.replaceWith(ico);
 }
 
 function tryLogin(){
-  const email=document.getElementById('em').value.trim().toLowerCase();
-  const btn=document.getElementById('lbtn');
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    showMsg('error','Please enter a valid email address.');
+  const email = document.getElementById('em').value.trim().toLowerCase();
+  const btn = document.getElementById('lbtn');
+
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showMsg('error', 'Please enter a valid email address.');
     return;
   }
-  btn.disabled=true;
-  showMsg('loading','Checking your access...');
-  const m=document.getElementById('msg');
-  const spin=document.createElement('div');
-  spin.className='spin';
-  const ico=document.getElementById('msg-ico');
-  if(ico)ico.replaceWith(spin);
-  setTimeout(()=>mockCheck(email),1400);
+
+  btn.disabled = true;
+  showMsg('loading', 'Checking your access...');
+  setSpinner();
+
+  checkAccess(email);
 }
 
-function mockCheck(email){
-  const btn=document.getElementById('lbtn');
+async function checkAccess(email){
+  const btn = document.getElementById('lbtn');
 
-  /* ── REPLACE WITH REAL SUPABASE CHECK ──────────────────────
-     const { data, error } = await supabase
-       .from('Compradores')
-       .select('ativo')
-       .eq('email', email)
-       .single();
-     const approved = !error && data?.ativo === true;
-  ──────────────────────────────────────────────────────────── */
-  const approved = email.includes('@');
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/customer_access?email=eq.${encodeURIComponent(email)}&product_code=eq.${PRODUCT_CODE}&access_status=eq.active&select=id,email,access_status&limit=1`,
+      {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-  if(approved){
-    document.getElementById('panel-email').style.display='none';
-    document.getElementById('panel-success').style.display='block';
-    let w=0;
-    const iv=setInterval(()=>{
-      w+=1.8;
-      document.getElementById('pfill').style.width=Math.min(w,100)+'%';
-      if(w>=100){clearInterval(iv);/* window.location.href='/app'; */}
-    },20);
-  } else {
-    btn.disabled=false;
-    const s=document.querySelector('.spin');
-    if(s){
-      const ico=document.createElement('svg');
-      ico.id='msg-ico';ico.setAttribute('width','16');ico.setAttribute('height','16');
-      ico.setAttribute('viewBox','0 0 24 24');ico.setAttribute('fill','none');
-      ico.setAttribute('stroke','currentColor');ico.setAttribute('stroke-width','2');
-      ico.setAttribute('stroke-linecap','round');ico.setAttribute('stroke-linejoin','round');
-      ico.style.flexShrink='0';
-      ico.innerHTML='<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
-      s.replaceWith(ico);
+    if(!res.ok){
+      throw new Error('Network error: ' + res.status);
     }
-    showMsg('error','Email not found. Check your email or contact support.');
+
+    const data = await res.json();
+    const approved = Array.isArray(data) && data.length > 0;
+
+    if(approved){
+      // Store session in sessionStorage so app can verify access
+      sessionStorage.setItem('offgrid_email', email);
+      sessionStorage.setItem('offgrid_access', 'granted');
+
+      // Show success animation then redirect
+      document.getElementById('panel-email').style.display = 'none';
+      document.getElementById('panel-success').style.display = 'block';
+      let w = 0;
+      const iv = setInterval(() => {
+        w += 1.8;
+        document.getElementById('pfill').style.width = Math.min(w, 100) + '%';
+        if(w >= 100){
+          clearInterval(iv);
+          window.location.href = APP_URL;
+        }
+      }, 20);
+
+    } else {
+      btn.disabled = false;
+      restoreIcon();
+      showMsg('error', 'Email not found or access not active. Check your email or contact support.');
+    }
+
+  } catch(err) {
+    console.error('Supabase error:', err);
+    btn.disabled = false;
+    restoreIcon();
+    showMsg('error', 'Connection error. Please try again in a few seconds.');
   }
 }
 </script>
